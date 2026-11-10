@@ -62,7 +62,7 @@ This guide details how to deploy a serverless, zero-maintenance webhook receiver
    - A new tab named `Practo Leads` will appear.
    - The first row will be automatically created with bold, brand-teal headers.
    - Your lead data will appear in the next row with timestamp, contact info, batch, and captured UTM parameters.
-5. Test anti-spam honeypot: Any payload with a non-empty `company` field will return `{ "ok": true }` to the bot but will be silently dropped without appending to the Sheet.
+5. Test anti-spam honeypot: Any payload with a non-empty `website_url` field will return `{ "ok": true }` to the bot but will be silently dropped without appending to the Sheet.
 
 ---
 

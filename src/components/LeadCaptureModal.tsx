@@ -106,7 +106,7 @@ export default function LeadCaptureModal({ open, onClose, intent = 'reserve' }: 
   const [step, setStep] = useState(1)
   const [contact, setContact] = useState<ContactInfo>({ fullName: '', whatsapp: '', email: '' })
   const [about, setAbout] = useState<AboutYou>({ role: '', interests: [], batch: '' })
-  const [companyHoneypot, setCompanyHoneypot] = useState('') // Honeypot spam trap
+  const [websiteUrlHoneypot, setWebsiteUrlHoneypot] = useState('') // Honeypot spam trap
   const [errors, setErrors] = useState<FieldErrors>({})
   const modalRef = useRef<HTMLDivElement>(null)
   const firstInputRef = useRef<HTMLInputElement>(null)
@@ -117,7 +117,7 @@ export default function LeadCaptureModal({ open, onClose, intent = 'reserve' }: 
     setStep(1)
     setContact({ fullName: '', whatsapp: '', email: '' })
     setAbout({ role: '', interests: [], batch: '' })
-    setCompanyHoneypot('')
+    setWebsiteUrlHoneypot('')
     setErrors({})
     onClose()
   }, [onClose])
@@ -274,7 +274,7 @@ export default function LeadCaptureModal({ open, onClose, intent = 'reserve' }: 
       utm_medium: utm.utm_medium || '',
       utm_campaign: utm.utm_campaign || '',
       page: window.location.pathname,
-      company: companyHoneypot, // hidden honeypot spam trap
+      website_url: websiteUrlHoneypot, // hidden honeypot spam trap
     }
 
     const webhookUrl = import.meta.env.VITE_LEAD_WEBHOOK_URL as string | undefined
@@ -289,7 +289,7 @@ export default function LeadCaptureModal({ open, onClose, intent = 'reserve' }: 
     } else {
       setStep(3)
     }
-  }, [contact, about, isSyllabus, intent, companyHoneypot, validateStep2, triggerSyllabusDownload])
+  }, [contact, about, isSyllabus, intent, websiteUrlHoneypot, validateStep2, triggerSyllabusDownload])
 
   /* ---- Interest toggle ---- */
 
@@ -329,17 +329,27 @@ export default function LeadCaptureModal({ open, onClose, intent = 'reserve' }: 
   function renderStep1() {
     return (
       <div className="space-y-4">
-        {/* Invisible honeypot field for spam prevention */}
-        <div style={{ display: 'none' }} aria-hidden="true">
-          <label htmlFor="lead-company">Company</label>
+        {/* Invisible honeypot field for spam prevention — positioned off-screen */}
+        <div
+          style={{
+            position: 'absolute',
+            left: '-9999px',
+            width: '1px',
+            height: '1px',
+            overflow: 'hidden',
+          }}
+          aria-hidden="true"
+        >
+          <label htmlFor="lead-website-url">Website URL</label>
           <input
-            id="lead-company"
+            id="lead-website-url"
             type="text"
-            name="company"
+            name="website_url"
             tabIndex={-1}
             autoComplete="off"
-            value={companyHoneypot}
-            onChange={(e) => setCompanyHoneypot(e.target.value)}
+            aria-hidden="true"
+            value={websiteUrlHoneypot}
+            onChange={(e) => setWebsiteUrlHoneypot(e.target.value)}
           />
         </div>
 

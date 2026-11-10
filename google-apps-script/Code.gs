@@ -48,8 +48,8 @@ function doPost(e) {
       return createJsonResponse({ ok: false, error: 'Malformed JSON payload' });
     }
 
-    // Honeypot anti-spam check: ignore requests where the hidden "company" field is filled
-    if (data.company && String(data.company).trim() !== '') {
+    // Honeypot anti-spam check: ignore requests where the hidden "website_url" field is filled
+    if (data.website_url && String(data.website_url).trim() !== '') {
       // Return ok:true silently to foil automated bots
       return createJsonResponse({ ok: true, dropped: 'honeypot' });
     }

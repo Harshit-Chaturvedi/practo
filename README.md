@@ -82,7 +82,7 @@ Every submission sent to `VITE_LEAD_WEBHOOK_URL` delivers a clean JSON payload m
 | `utm_medium` | `string` | Marketing medium (`"social"`, `"cpc"`, `"email"`) |
 | `utm_campaign` | `string` | Marketing campaign tag (`"launch_batch_1"`) |
 | `page` | `string` | Current route path (`"/learn"`) |
-| `company` | `string` | Hidden honeypot field (empty for humans; non-empty drops request) |
+| `website_url` | `string` | Hidden honeypot field (empty for humans; non-empty drops request) |
 
 ### 3. `/carousel` — AI-Generated Sample Carousel
 - **Data-Driven Architecture**: Structured in `/src/data/carousel.json` with 7 slides (Hook + 5 Content Slides + CTA) formatted for standard 1080×1350px (4:5 portrait aspect ratio).
