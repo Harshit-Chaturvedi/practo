@@ -140,7 +140,6 @@ function SelectField({
         type="button"
         onClick={() => setOpen((o) => !o)}
         className="flex min-h-[44px] w-full items-center gap-2 rounded-[12px] border border-border bg-white px-3.5 py-2.5 text-left text-sm transition-colors hover:border-teal focus-visible:outline-teal"
-        aria-label={ariaLabel}
         aria-expanded={open}
         aria-haspopup="listbox"
       >
@@ -774,7 +773,6 @@ export default function HomePage() {
                       : 'border-border bg-white text-ink hover:border-teal/50 hover:shadow-sm'
                   }`}
                   aria-pressed={isActive}
-                  aria-label={`Filter by ${tile.label}`}
                 >
                   <div
                     className={`w-12 h-12 rounded-[12px] flex items-center justify-center mb-2.5 transition-transform duration-200 group-hover:scale-110 ${

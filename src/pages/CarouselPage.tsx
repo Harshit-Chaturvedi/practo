@@ -147,7 +147,6 @@ export default function CarouselPage() {
               disabled={exportingPdf}
               leftIcon={exportingPdf ? <Loader2 size={18} className="animate-spin" /> : <FileDown size={18} />}
               className="shrink-0 shadow-sm"
-              aria-label="Export all slides as PDF"
             >
               {exportingPdf ? 'Compiling PDF…' : 'Export Full Deck (PDF)'}
             </Button>
@@ -209,7 +208,6 @@ export default function CarouselPage() {
                 disabled={exportingSlide === idx}
                 leftIcon={exportingSlide === idx ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
                 className="w-full text-xs"
-                aria-label={`Export slide ${slide.number} as PNG`}
               >
                 {exportingSlide === idx ? 'Generating…' : 'Export PNG'}
               </Button>

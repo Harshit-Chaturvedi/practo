@@ -84,7 +84,7 @@ export default function Header() {
                 type="button"
                 onClick={() => setCityOpen(!cityOpen)}
                 className="flex items-center gap-1 text-xs sm:text-sm font-heading font-semibold text-text-muted hover:text-ink px-2 sm:px-3 py-2 rounded-[12px] border border-border bg-white hover:bg-surface transition-colors min-h-[44px]"
-                aria-label="Select city"
+                aria-label={`City: ${selectedCity}`}
                 aria-expanded={cityOpen}
               >
                 <MapPin size={14} className="text-teal shrink-0" />

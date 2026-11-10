@@ -82,9 +82,9 @@ export default function Footer() {
 
             {/* Column 2: Platform Links (2 cols) */}
             <div className="md:col-span-2 space-y-3">
-              <h4 className="font-heading font-bold text-xs uppercase tracking-wider text-teal-200">
+              <h3 className="font-heading font-bold text-xs uppercase tracking-wider text-teal-200">
                 Platform
-              </h4>
+              </h3>
               <ul className="space-y-2 text-sm text-teal-100/90 font-medium">
                 <li>
                   <Link to="/" className="hover:text-white transition-colors">
@@ -111,9 +111,9 @@ export default function Footer() {
 
             {/* Column 3: Resources & Tools (2 cols) */}
             <div className="md:col-span-2 space-y-3">
-              <h4 className="font-heading font-bold text-xs uppercase tracking-wider text-teal-200">
+              <h3 className="font-heading font-bold text-xs uppercase tracking-wider text-teal-200">
                 Systems
-              </h4>
+              </h3>
               <ul className="space-y-2 text-sm text-teal-100/90 font-medium">
                 <li>
                   <Link to="/workflow" className="hover:text-white transition-colors">
@@ -152,9 +152,9 @@ export default function Footer() {
 
             {/* Column 4: Legal & Standards (3 cols) */}
             <div className="md:col-span-3 space-y-3">
-              <h4 className="font-heading font-bold text-xs uppercase tracking-wider text-teal-200">
+              <h3 className="font-heading font-bold text-xs uppercase tracking-wider text-teal-200">
                 Trust &amp; Legal
-              </h4>
+              </h3>
               <ul className="space-y-2 text-sm text-teal-100/90 font-medium">
                 <li>
                   <button

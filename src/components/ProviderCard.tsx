@@ -21,12 +21,12 @@ interface ProviderCardProps {
 }
 
 const typeBadgeColors: Record<Provider['type'], string> = {
-  clinic: 'bg-teal/10 text-teal',
-  hospital: 'bg-indigo/10 text-indigo',
-  boarding: 'bg-amber/15 text-amber-dark',
-  diagnostics: 'bg-purple-100 text-purple-700',
-  ambulance: 'bg-red-light text-red-emergency',
-  ngo: 'bg-green-100 text-green-700',
+  clinic: 'bg-teal-50 text-teal-800 border border-teal-200',
+  hospital: 'bg-teal-100 text-teal-900 border border-teal-300',
+  boarding: 'bg-amber-50 text-amber-900 border border-amber-200',
+  diagnostics: 'bg-teal-50 text-teal-800 border border-teal-200',
+  ambulance: 'bg-red-50 text-red-700 border border-red-200',
+  ngo: 'bg-emerald-50 text-emerald-800 border border-emerald-200',
 }
 
 export default function ProviderCard({
@@ -109,6 +109,7 @@ export default function ProviderCard({
             </span>
             {provider.verified && (
               <span
+                role="img"
                 className="inline-flex items-center text-teal"
                 aria-label="Verified provider"
                 title="Verified"
@@ -122,21 +123,21 @@ export default function ProviderCard({
         {/* Rating + Distance + Open/Closed */}
         <div className="flex flex-wrap items-center gap-3 text-sm">
           {/* Rating */}
-          <span className="inline-flex items-center gap-1 font-medium text-ink">
+          <span className="inline-flex items-center gap-1 font-semibold text-ink">
             <Star size={16} className="fill-amber text-amber" />
             {provider.rating.toFixed(1)}
           </span>
 
           {/* Distance */}
-          <span className="text-gray-500">{provider.distance}</span>
+          <span className="text-gray-500 font-medium">{provider.distance}</span>
 
           {/* Open/Closed */}
           {provider.isOpen ? (
-            <span className="inline-flex items-center gap-1 rounded-[var(--radius-chip)] bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-open">
+            <span className="inline-flex items-center gap-1 rounded-[var(--radius-chip)] bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-xs font-bold text-emerald-800">
               Open
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 rounded-[var(--radius-chip)] bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-emergency">
+            <span className="inline-flex items-center gap-1 rounded-[var(--radius-chip)] bg-red-50 border border-red-200 px-2.5 py-0.5 text-xs font-bold text-red-800">
               Closed
             </span>
           )}
