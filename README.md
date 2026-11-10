@@ -81,19 +81,34 @@ The application will be live at `http://localhost:5173`.
 
 ---
 
-## Design System Decisions
+## Unified Design System & Token Architecture
 
-| Token | Value | Rationale |
+The entire platform has been refreshed into ONE cohesive, clinical-but-warm healthtech aesthetic spanning all four routes (`/`, `/learn`, `/carousel`, `/workflow`). The previous separate indigo accent on `/learn` was deprecated to ensure the educational ecosystem and discovery app share identical brand tokens, differing only by layout structure and imagery.
+
+| Design Token | Value / Scale | Strategic Rationale |
 |---|---|---|
-| Background Cream | `#FBF8F3` | Warm, calming surface reducing clinical anxiety for pet owners |
-| Primary Ink | `#1F2A2E` | Deep slate-teal providing WCAG AAA contrast (13.8:1) over cream |
-| Primary Teal | `#0F766E` | Grounded, trustworthy healthcare tone (WCAG AA compliant) |
-| Accent Amber | `#F59E0B` | Warm golden amber reserved for primary action CTAs |
-| Surface Mint | `#EEF5F3` | Subtle cool tinted surface for cards and category chips |
-| Border | `#E3E0D8` | Soft organic divider tone avoiding stark gray lines |
-| Education Indigo | `#3730A3` | Intellectually distinguished accent for the `/learn` ecosystem |
-| Typography | Space Grotesk / Inter | Space Grotesk headings for friendly modern character; Inter for maximum legibility |
-| Border Radii | `14px`–`20px` | Soft, friendly curvature avoiding sharp harsh corners |
+| **Primary Teal** | `#0F766E` (Teal 600) | Grounded, trustworthy healthcare anchor with a full 50–900 scale (`#0B4F4A` Teal 900 for hero banners, footers, and headings) |
+| **Primary Accent Amber** | `#F59E0B` (Amber 500) | Warm golden amber used **strictly** for primary conversion CTAs and high-intent actions |
+| **Emergency Red** | `#DC2626` (Red 600) | High-contrast alert red reserved exclusively for emergency triage, ambulance calls, and acute warning chips |
+| **Primary Ink** | `#1F2A2E` | Deep warm slate-ink delivering WCAG AAA contrast ratio (13.8:1) over cream surfaces |
+| **Muted Text** | `#4B5563` (Gray 600) | High-legibility neutral text meeting strict WCAG AA contrast (≥ 4.5:1) on all background surfaces |
+| **Background Cream** | `#FBF8F3` | Warm, calming surface reducing clinical anxiety for pet owners |
+| **Surface Mint** | `#EEF5F3` | Subtle cool-tinted surface for secondary cards, inputs, and category containers |
+| **Divider Border** | `#E3E0D8` | Soft organic divider tone avoiding sterile stark borders |
+| **Typography** | Manrope + Inter | **Manrope (700/800)** for authoritative yet welcoming headlines; **Inter** for clinical body legibility with `font-display: swap` |
+| **8pt Spacing Grid** | 8px / 16px / 24px / 32px | Standard 8pt spacing system with container max-width `1200px` (24px desktop gutters, 16px mobile gutters) |
+| **Curvature & Radii** | `12px` (inputs/buttons), `16px` (cards), `24px` (heroes) | Soft, organic radii maintaining professional precision without generic AI template feels |
+| **Elevation & Motion** | Soft teal-tinted shadows | Subtle multi-level elevation (`shadow-xs`, `shadow-sm`, `shadow-md`) with 150–250ms ease-out transitions respecting `prefers-reduced-motion` |
+
+### Shared UI Component Suite (`src/components/ui/`)
+All four pages build upon a unified component library:
+- **`Button`**: Primary (amber), Secondary (teal), Outline, Ghost, Danger variants with loading indicators, icon slots, and guaranteed 44px min touch height.
+- **`Card`**: White, Surface, and Cream variants with optional hover borders and interactive selection states.
+- **`Badge`**: Teal, Amber, Neutral, Red, and Green status chips with semantic borders.
+- **`Container`**: Fluid responsive wrappers (`narrow` 896px, `default` 1200px, `wide` 1400px) with standardized gutters.
+- **`SectionHeader`**: Coordinated eyebrow, title, and description lockups supporting light and dark surfaces.
+- **`ModalShell`**: Reusable modal foundation powering Booking, Lead Capture, and Correction forms with keyboard focus trapping, `Escape` key dismissal, and backdrop scroll locks.
+- **`Accordion` & `ToggleSwitch`**: Keyboard-navigable accessible disclosure widgets.
 
 ### Accessibility & Interaction Highlights
 - **Touch Targets**: All interactive elements (buttons, inputs, category tiles, close buttons) have a minimum touch footprint of 44×44px.
