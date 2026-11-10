@@ -6,14 +6,18 @@ import {
   Navigation,
   Calendar,
   Pencil,
+  Info,
 } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import type { Provider } from '@/data/providers'
 import CorrectionModal from './CorrectionModal'
+import BookingModal from './BookingModal'
 
 interface ProviderCardProps {
   provider: Provider
   index: number
+  isSelected?: boolean
+  onSelect?: () => void
 }
 
 const typeBadgeColors: Record<Provider['type'], string> = {
@@ -25,19 +29,70 @@ const typeBadgeColors: Record<Provider['type'], string> = {
   ngo: 'bg-green-100 text-green-700',
 }
 
-export default function ProviderCard({ provider, index }: ProviderCardProps) {
+export default function ProviderCard({
+  provider,
+  index,
+  isSelected = false,
+  onSelect,
+}: ProviderCardProps) {
   const [correctionOpen, setCorrectionOpen] = useState(false)
+  const [bookingOpen, setBookingOpen] = useState(false)
+  const [showCallToast, setShowCallToast] = useState(false)
+
   const badgeColor = typeBadgeColors[provider.type] ?? 'bg-surface text-ink'
+
+  const handleCallClick = () => {
+    setShowCallToast(true)
+    setTimeout(() => {
+      setShowCallToast(false)
+    }, 3500)
+  }
 
   return (
     <>
       <motion.article
-        className="flex flex-col gap-4 rounded-[var(--radius-card)] border border-border bg-white p-5 shadow-sm transition-shadow hover:shadow-md sm:p-6"
+        id={`provider-${provider.id}`}
+        onClick={onSelect}
+        className={`relative flex flex-col gap-4 rounded-[var(--radius-card)] border bg-white p-5 shadow-sm transition-all sm:p-6 ${
+          isSelected
+            ? 'border-teal ring-2 ring-teal/30 shadow-md'
+            : 'border-border hover:shadow-md'
+        }`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: index * 0.04 }}
         aria-label={`Provider: ${provider.name}`}
       >
+        {/* Call Toast Notification */}
+        <AnimatePresence>
+          {showCallToast && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              className="absolute left-4 right-4 top-4 z-20 flex items-center justify-between gap-2 rounded-xl bg-ink p-3 text-xs text-white shadow-lg"
+            >
+              <div className="flex items-center gap-2">
+                <Info size={16} className="shrink-0 text-amber" />
+                <span>
+                  <strong>{provider.phoneDisplay}:</strong> Demo listing — calling is disabled in this prototype.
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowCallToast(false)
+                }}
+                className="text-gray-500 hover:text-white p-1"
+                aria-label="Close message"
+              >
+                ✕
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Top Row: Name, Badge, Verified */}
         <div className="flex flex-wrap items-start gap-2">
           <div className="flex-1 min-w-0">
@@ -85,7 +140,7 @@ export default function ProviderCard({ provider, index }: ProviderCardProps) {
               Closed
             </span>
           )}
-          <span className="text-xs text-gray-400">{provider.hours}</span>
+          <span className="text-xs text-gray-500">{provider.hours}</span>
         </div>
 
         {/* Service Chips */}
@@ -110,20 +165,21 @@ export default function ProviderCard({ provider, index }: ProviderCardProps) {
         </div>
 
         {/* Last verified */}
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-gray-500">
           Last verified {provider.lastVerified}
         </p>
 
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-2 border-t border-border pt-4">
-          <a
-            href={`tel:${provider.phone}`}
+          <button
+            type="button"
+            onClick={handleCallClick}
             className="inline-flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-[var(--radius-button)] border border-teal px-4 py-2.5 text-sm font-medium text-teal transition-colors hover:bg-teal hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
-            aria-label={`Call ${provider.name}`}
+            aria-label={`Call ${provider.name} at ${provider.phoneDisplay}`}
           >
             <Phone size={16} />
             <span className="hidden xs:inline">Call</span>
-          </a>
+          </button>
 
           <a
             href={`https://www.google.com/maps/dir/?api=1&destination=${provider.lat},${provider.lng}`}
@@ -138,6 +194,7 @@ export default function ProviderCard({ provider, index }: ProviderCardProps) {
 
           <button
             type="button"
+            onClick={() => setBookingOpen(true)}
             className="inline-flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-[var(--radius-button)] bg-teal px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-teal-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
             aria-label={`Book appointment at ${provider.name}`}
           >
@@ -148,7 +205,7 @@ export default function ProviderCard({ provider, index }: ProviderCardProps) {
           <button
             type="button"
             onClick={() => setCorrectionOpen(true)}
-            className="ml-auto inline-flex min-h-[44px] items-center gap-1 px-2 text-xs text-gray-400 underline-offset-2 transition-colors hover:text-teal hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
+            className="ml-auto inline-flex min-h-[44px] items-center gap-1 px-2 text-xs text-gray-500 underline-offset-2 transition-colors hover:text-teal hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
             aria-label={`Submit a correction for ${provider.name}`}
           >
             <Pencil size={12} />
@@ -161,6 +218,13 @@ export default function ProviderCard({ provider, index }: ProviderCardProps) {
         providerName={provider.name}
         isOpen={correctionOpen}
         onClose={() => setCorrectionOpen(false)}
+      />
+
+      <BookingModal
+        providerId={provider.id}
+        providerName={provider.name}
+        isOpen={bookingOpen}
+        onClose={() => setBookingOpen(false)}
       />
     </>
   )

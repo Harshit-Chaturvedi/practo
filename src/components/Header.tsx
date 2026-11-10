@@ -34,7 +34,7 @@ export default function Header() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
+          <nav className="hidden lg:flex items-center gap-1" aria-label="Main navigation">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -97,7 +97,7 @@ export default function Header() {
             {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-gray-600 hover:text-ink min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="lg:hidden p-2 text-gray-600 hover:text-ink min-h-[44px] min-w-[44px] flex items-center justify-center"
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={mobileMenuOpen}
             >
@@ -109,7 +109,7 @@ export default function Header() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <nav className="md:hidden border-t border-border bg-white" aria-label="Mobile navigation">
+        <nav className="lg:hidden border-t border-border bg-white" aria-label="Mobile navigation">
           <div className="px-4 py-3 space-y-1">
             {navLinks.map((link) => (
               <Link

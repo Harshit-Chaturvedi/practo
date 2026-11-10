@@ -78,27 +78,47 @@ async function run() {
       }, el)
     }
 
-    // Now generate PDF using jsPDF
-    console.log('Generating PDF...')
+    // Now generate PDF using jsPDF with JPEG compression (quality 0.9)
+    console.log('Generating PDF with JPEG compression...')
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'pt',
       format: [1080, 1350],
+      compress: true,
     })
 
-    for (let i = 0; i < pngPaths.length; i++) {
+    for (let i = 0; i < slideElements.length; i++) {
+      const el = slideElements[i]
+      await page.evaluate((element) => {
+        element.style.position = 'fixed'
+        element.style.left = '0px'
+        element.style.top = '0px'
+        element.style.zIndex = '99999'
+      }, el)
+
+      await page.setViewport({ width: 1080, height: 1350, deviceScaleFactor: 1 })
+      await new Promise((r) => setTimeout(r, 200))
+
+      const jpegBuffer = await el.screenshot({ type: 'jpeg', quality: 90 })
+      const base64 = `data:image/jpeg;base64,${jpegBuffer.toString('base64')}`
+
       if (i > 0) {
         pdf.addPage([1080, 1350], 'portrait')
       }
-      const imgData = fs.readFileSync(pngPaths[i])
-      const base64 = `data:image/png;base64,${imgData.toString('base64')}`
-      pdf.addImage(base64, 'PNG', 0, 0, 1080, 1350)
+      pdf.addImage(base64, 'JPEG', 0, 0, 1080, 1350, undefined, 'FAST')
+
+      await page.evaluate((element) => {
+        element.style.position = ''
+        element.style.left = ''
+        element.style.top = ''
+        element.style.zIndex = ''
+      }, el)
     }
 
     const pdfPath = path.join(exportsDir, 'practo-carousel.pdf')
     const pdfBuffer = Buffer.from(pdf.output('arraybuffer'))
     fs.writeFileSync(pdfPath, pdfBuffer)
-    console.log(`Saved PDF to ${pdfPath}`)
+    console.log(`Saved PDF to ${pdfPath} (${pdfBuffer.length} bytes)`)
 
     console.log('Export generation completed successfully!')
   } finally {

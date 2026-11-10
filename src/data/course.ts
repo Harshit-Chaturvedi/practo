@@ -13,7 +13,7 @@ export const courseModules: CourseModule[] = [
     id: 'ai-tools',
     number: 1,
     title: 'AI Tools & Prompting',
-    description: 'Master the art of working with AI assistants to 10x your productivity.',
+    description: 'Master the art of working with AI assistants to dramatically speed up your daily workflows.',
     topics: [
       'Prompt engineering fundamentals',
       'ChatGPT, Claude, and Gemini for work',

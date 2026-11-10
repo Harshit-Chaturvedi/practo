@@ -24,6 +24,7 @@ import {
 import { providers, animalTypes, languageOptions } from '@/data/providers'
 import type { Provider } from '@/data/providers'
 import ProviderCard from '@/components/ProviderCard'
+import InteractiveMap from '@/components/InteractiveMap'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -146,12 +147,12 @@ function SelectField({
         aria-haspopup="listbox"
       >
         {icon}
-        <span className={value ? 'text-ink' : 'text-gray-400'}>
+        <span className={value ? 'text-ink' : 'text-gray-500'}>
           {value || label}
         </span>
         <ChevronDown
           size={16}
-          className={`ml-auto text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`ml-auto text-gray-500 transition-transform ${open ? 'rotate-180' : ''}`}
         />
       </button>
       <AnimatePresence>
@@ -168,7 +169,7 @@ function SelectField({
             <li
               role="option"
               aria-selected={!value}
-              className="min-h-[44px] cursor-pointer px-3.5 py-2.5 text-sm text-gray-400 hover:bg-surface"
+              className="min-h-[44px] cursor-pointer px-3.5 py-2.5 text-sm text-gray-500 hover:bg-surface"
               onClick={() => {
                 onChange('')
                 setOpen(false)
@@ -275,6 +276,7 @@ export default function HomePage() {
   const [sortBy, setSortBy] = useState<SortOption>('nearest')
   const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+  const [selectedMapProviderId, setSelectedMapProviderId] = useState<string | null>(null)
 
   const resultsRef = useRef<HTMLElement>(null)
 
@@ -558,7 +560,7 @@ export default function HomePage() {
             onChange={(e) => setMaxDistance(Number(e.target.value))}
             className="w-full accent-teal"
           />
-          <div className="flex justify-between text-xs text-gray-400">
+          <div className="flex justify-between text-xs text-gray-500">
             <span>0 km</span>
             <span>10 km</span>
           </div>
@@ -691,7 +693,7 @@ export default function HomePage() {
             <div className="relative flex-1 min-w-[160px]">
               <MapPin
                 size={18}
-                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500"
               />
               <input
                 type="text"
@@ -699,7 +701,7 @@ export default function HomePage() {
                 onChange={(e) => setLocationQuery(e.target.value)}
                 placeholder="Location"
                 aria-label="Search by location"
-                className="min-h-[44px] w-full rounded-[var(--radius-input)] border border-border bg-white py-2.5 pl-10 pr-3.5 text-sm text-ink placeholder:text-gray-400 transition-colors focus:border-teal focus:ring-1 focus:ring-teal focus-visible:outline-none"
+                className="min-h-[44px] w-full rounded-[var(--radius-input)] border border-border bg-white py-2.5 pl-10 pr-3.5 text-sm text-ink placeholder:text-gray-500 transition-colors focus:border-teal focus:ring-1 focus:ring-teal focus-visible:outline-none"
               />
             </div>
 
@@ -906,12 +908,17 @@ export default function HomePage() {
             <div className="flex-1">
               {/* Top bar: count, sort, view toggle */}
               <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm text-gray-500">
-                  <span className="font-semibold text-ink">
-                    {filteredProviders.length}
-                  </span>{' '}
-                  {filteredProviders.length === 1 ? 'result' : 'results'} found
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm text-gray-500">
+                    <span className="font-semibold text-ink">
+                      {filteredProviders.length}
+                    </span>{' '}
+                    {filteredProviders.length === 1 ? 'result' : 'results'} found
+                  </p>
+                  <span className="inline-flex items-center rounded-full bg-amber/15 px-2.5 py-0.5 text-[11px] font-semibold text-amber-900 border border-amber/30">
+                    Demo data
+                  </span>
+                </div>
 
                 <div className="flex items-center gap-2">
                   {/* Sort */}
@@ -960,26 +967,35 @@ export default function HomePage() {
 
               {/* View content */}
               {viewMode === 'map' ? (
-                <div
-                  className="flex min-h-[400px] items-center justify-center rounded-[var(--radius-card)] border border-border bg-white shadow-sm"
-                  style={{
-                    backgroundImage:
-                      'linear-gradient(to right, var(--color-border) 1px, transparent 1px), linear-gradient(to bottom, var(--color-border) 1px, transparent 1px)',
-                    backgroundSize: '32px 32px',
-                  }}
-                  role="img"
-                  aria-label="Map view placeholder"
-                >
-                  <div className="flex flex-col items-center gap-3 rounded-[var(--radius-card)] bg-white/90 p-8 text-center shadow-sm">
-                    <Map size={40} className="text-teal" />
-                    <p className="font-heading text-lg font-semibold text-ink">
-                      Map View
-                    </p>
-                    <p className="max-w-xs text-sm text-gray-500">
-                      Integrate with mapping API to show provider locations on
-                      an interactive map.
-                    </p>
-                  </div>
+                <div className="flex flex-col gap-6">
+                  <InteractiveMap
+                    providers={filteredProviders}
+                    selectedProviderId={selectedMapProviderId}
+                    onSelectProvider={(id) => setSelectedMapProviderId(id)}
+                  />
+                  {filteredProviders.length === 0 ? (
+                    <div className="flex min-h-[160px] flex-col items-center justify-center gap-2 rounded-[var(--radius-card)] border border-border bg-white p-6 text-center">
+                      <SearchX size={32} className="text-gray-300" />
+                      <p className="font-heading text-sm font-semibold text-ink">
+                        No pins match current filters
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-4">
+                      <h4 className="font-heading text-sm font-semibold text-ink">
+                        Providers on this Map ({filteredProviders.length})
+                      </h4>
+                      {filteredProviders.map((provider, i) => (
+                        <ProviderCard
+                          key={provider.id}
+                          provider={provider}
+                          index={i}
+                          isSelected={selectedMapProviderId === provider.id}
+                          onSelect={() => setSelectedMapProviderId(provider.id)}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               ) : filteredProviders.length === 0 ? (
                 <div className="flex min-h-[300px] flex-col items-center justify-center gap-3 rounded-[var(--radius-card)] border border-border bg-white p-8 text-center">

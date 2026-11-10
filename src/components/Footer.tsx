@@ -1,9 +1,43 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Heart } from 'lucide-react'
+import { Heart, Info } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function Footer() {
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
+
+  const handlePlaceholderClick = (e: React.MouseEvent, label: string) => {
+    e.preventDefault()
+    setToastMessage(`${label} will be live during the public beta.`)
+    setTimeout(() => {
+      setToastMessage(null)
+    }, 3000)
+  }
+
   return (
-    <footer className="bg-ink text-white/80">
+    <footer className="relative bg-ink text-white/80">
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-xl bg-teal px-4 py-3 text-xs font-medium text-white shadow-xl"
+          >
+            <Info size={16} />
+            <span>{toastMessage}</span>
+            <button
+              type="button"
+              onClick={() => setToastMessage(null)}
+              className="ml-2 hover:text-white/70"
+            >
+              ✕
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12">
           {/* Brand */}
@@ -37,9 +71,9 @@ export default function Footer() {
             <h4 className="font-heading font-semibold text-white text-sm mb-4">Resources</h4>
             <ul className="space-y-2.5">
               <li><Link to="/workflow" className="text-sm hover:text-white transition-colors">Workflow</Link></li>
-              <li><a href="#" className="text-sm hover:text-white transition-colors">Blog</a></li>
-              <li><a href="#" className="text-sm hover:text-white transition-colors">Partner with us</a></li>
-              <li><a href="#" className="text-sm hover:text-white transition-colors">Careers</a></li>
+              <li><button type="button" onClick={(e) => handlePlaceholderClick(e, 'Blog')} className="text-sm text-left hover:text-white transition-colors">Blog</button></li>
+              <li><button type="button" onClick={(e) => handlePlaceholderClick(e, 'Partner portal')} className="text-sm text-left hover:text-white transition-colors">Partner with us</button></li>
+              <li><button type="button" onClick={(e) => handlePlaceholderClick(e, 'Careers page')} className="text-sm text-left hover:text-white transition-colors">Careers</button></li>
             </ul>
           </div>
 
@@ -47,9 +81,9 @@ export default function Footer() {
           <div>
             <h4 className="font-heading font-semibold text-white text-sm mb-4">Legal</h4>
             <ul className="space-y-2.5">
-              <li><a href="#" className="text-sm hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="text-sm hover:text-white transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="text-sm hover:text-white transition-colors">Accessibility</a></li>
+              <li><button type="button" onClick={(e) => handlePlaceholderClick(e, 'Privacy policy')} className="text-sm text-left hover:text-white transition-colors">Privacy Policy</button></li>
+              <li><button type="button" onClick={(e) => handlePlaceholderClick(e, 'Terms of service')} className="text-sm text-left hover:text-white transition-colors">Terms of Service</button></li>
+              <li><button type="button" onClick={(e) => handlePlaceholderClick(e, 'Accessibility statement')} className="text-sm text-left hover:text-white transition-colors">Accessibility</button></li>
             </ul>
           </div>
         </div>

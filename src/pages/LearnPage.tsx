@@ -113,7 +113,7 @@ function FAQAccordion() {
               </span>
               <ChevronDown
                 size={20}
-                className={`text-gray-400 shrink-0 transition-transform duration-300 ${
+                className={`text-gray-500 shrink-0 transition-transform duration-300 ${
                   isOpen ? 'rotate-180' : ''
                 }`}
               />
@@ -144,13 +144,23 @@ function FAQAccordion() {
 
 export default function LearnPage() {
   const [modalOpen, setModalOpen] = useState(false)
+  const [modalIntent, setModalIntent] = useState<'reserve' | 'syllabus'>('reserve')
 
-  const openModal = useCallback(() => setModalOpen(true), [])
+  const openReserveModal = useCallback(() => {
+    setModalIntent('reserve')
+    setModalOpen(true)
+  }, [])
+
+  const openSyllabusModal = useCallback(() => {
+    setModalIntent('syllabus')
+    setModalOpen(true)
+  }, [])
+
   const closeModal = useCallback(() => setModalOpen(false), [])
 
   return (
     <>
-      <main className="bg-cream min-h-screen pb-24 md:pb-0">
+      <main className="bg-cream min-h-screen pb-32 md:pb-12">
         {/* ========== 1. Hero ========== */}
         <section className="relative overflow-hidden bg-indigo" aria-label="Course hero">
           <div className="absolute inset-0 opacity-10">
@@ -182,14 +192,14 @@ export default function LearnPage() {
               className="mt-8 flex flex-col sm:flex-row gap-3 justify-center"
             >
               <button
-                onClick={openModal}
+                onClick={openReserveModal}
                 className="inline-flex items-center justify-center gap-2 min-h-[44px] px-8 py-3 bg-white text-indigo font-semibold rounded-[14px] hover:bg-gray-100 transition-colors shadow-lg"
               >
                 Reserve Your Seat
                 <ArrowRight size={18} />
               </button>
               <button
-                onClick={openModal}
+                onClick={openSyllabusModal}
                 className="inline-flex items-center justify-center gap-2 min-h-[44px] px-8 py-3 border-2 border-white/60 text-white font-semibold rounded-[14px] hover:bg-white/10 transition-colors"
               >
                 <Download size={18} />
@@ -364,7 +374,7 @@ export default function LearnPage() {
               className="w-24 h-24 rounded-full bg-gray-200 border-2 border-border flex items-center justify-center shrink-0"
               aria-label="Mentor photo placeholder"
             >
-              <span className="text-gray-400 text-xs text-center px-2 leading-tight">
+              <span className="text-gray-500 text-xs text-center px-2 leading-tight">
                 Mentor Photo
               </span>
             </div>
@@ -432,7 +442,7 @@ export default function LearnPage() {
                   </ul>
 
                   <button
-                    onClick={openModal}
+                    onClick={openReserveModal}
                     className={`mt-6 w-full min-h-[44px] px-4 py-2.5 font-semibold rounded-[14px] transition-colors ${
                       batch.highlighted
                         ? 'bg-indigo text-white hover:bg-indigo-light'
@@ -462,10 +472,10 @@ export default function LearnPage() {
               Ready to Future-Proof Your Skills?
             </h2>
             <p className="mt-4 text-white/80 max-w-md mx-auto">
-              Join hundreds of learners building real-world AI skills.
+              Join the founding cohort building real-world AI skills.
             </p>
             <button
-              onClick={openModal}
+              onClick={openReserveModal}
               className="mt-8 inline-flex items-center justify-center gap-2 min-h-[44px] px-8 py-3.5 bg-amber text-ink font-bold rounded-[14px] hover:bg-amber-dark transition-colors shadow-lg text-lg"
             >
               Reserve Your Seat Now
@@ -478,7 +488,7 @@ export default function LearnPage() {
       {/* ========== 10. Sticky Mobile CTA Bar ========== */}
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-surface border-t border-border px-4 py-3">
         <button
-          onClick={openModal}
+          onClick={openReserveModal}
           className="w-full min-h-[44px] px-4 py-3 bg-indigo text-white font-semibold rounded-[14px] hover:bg-indigo-light transition-colors"
         >
           Reserve Your Seat
@@ -486,7 +496,7 @@ export default function LearnPage() {
       </div>
 
       {/* ========== 11. Lead Capture Modal ========== */}
-      <LeadCaptureModal open={modalOpen} onClose={closeModal} />
+      <LeadCaptureModal open={modalOpen} onClose={closeModal} intent={modalIntent} />
     </>
   )
 }

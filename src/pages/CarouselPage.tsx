@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback } from 'react'
-import { toPng } from 'html-to-image'
+import { toPng, toJpeg } from 'html-to-image'
 import { jsPDF } from 'jspdf'
 import { Download, FileDown, Loader2, Image as ImageIcon } from 'lucide-react'
 import CarouselSlide, { type SlideData } from '@/components/CarouselSlide'
@@ -80,10 +80,18 @@ export default function CarouselPage() {
   const handleExportPdf = useCallback(async () => {
     setExportingPdf(true)
     try {
-      /* Capture all slides as PNGs */
+      /* Capture all slides as compressed JPEG (quality 0.9) */
       const images: string[] = []
       for (let i = 0; i < data.slides.length; i++) {
-        images.push(await captureSlide(i))
+        const node = exportNodesRef.current[i]
+        if (!node) throw new Error(`Slide ${i} ref not found`)
+        const jpegData = await toJpeg(node, {
+          width: SLIDE_W,
+          height: SLIDE_H,
+          quality: 0.9,
+          cacheBust: true,
+        })
+        images.push(jpegData)
       }
 
       /* Create PDF — use mm units, size proportional to 1080:1350 */
@@ -94,11 +102,12 @@ export default function CarouselPage() {
         orientation: 'portrait',
         unit: 'mm',
         format: [pdfW, pdfH],
+        compress: true,
       })
 
       images.forEach((img, idx) => {
         if (idx > 0) pdf.addPage([pdfW, pdfH], 'portrait')
-        pdf.addImage(img, 'PNG', 0, 0, pdfW, pdfH)
+        pdf.addImage(img, 'JPEG', 0, 0, pdfW, pdfH, undefined, 'FAST')
       })
 
       pdf.save('practo-carousel.pdf')
@@ -107,7 +116,7 @@ export default function CarouselPage() {
     } finally {
       setExportingPdf(false)
     }
-  }, [captureSlide])
+  }, [])
 
   /* ---- Render ---------------------------------------------------- */
 
@@ -151,7 +160,7 @@ export default function CarouselPage() {
           <span className="font-heading text-sm font-semibold text-ink">
             {data.topic}
           </span>
-          <span className="text-gray-400 text-sm">
+          <span className="text-gray-500 text-sm">
             · {data.slides.length} slides · 1080 × 1350
           </span>
         </div>

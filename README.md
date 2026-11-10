@@ -35,44 +35,42 @@ The application will be live at `http://localhost:5173`.
 ## Routes & Feature Breakdown
 
 ### 1. `/` — Practo for Animals MVP (Discovery & Search Flow)
-- **Sticky Navigation**: Brand mark, "Explore Services" shortcut, "For Businesses" link, quick city selector (Mumbai, Delhi, Bangalore, etc.), and prominent "List Your Business" CTA.
+- **Sticky Navigation**: Brand mark, "Explore Services" shortcut, "For Businesses" link, quick city selector (Mumbai, Delhi, Bangalore, etc.), and prominent "List Your Business" CTA. Responsive breakpoint configured at `lg` to prevent tablet horizontal overflow.
 - **Hero Section**:
   - Clear value proposition: *"Find trusted animal care near you"*.
-  - 3-field search bar: Location input with autocomplete, animal type selector (Dogs, Cats, Birds, etc.), and care need dropdown.
+  - 3-field search bar: Location input, animal type selector (Dogs, Cats, Birds, etc.), and care need dropdown.
   - High-intent primary CTA *"Find a Vet"* alongside a prominent red *"Emergency / Find Ambulance"* quick-action chip.
 - **6 Category Tiles**: Clinics, Hospitals, Boarding, Diagnostics, Ambulances, and NGOs & Shelters with interactive active states that filter results instantly.
 - **Results & Multi-faceted Filtering**:
   - Filter panel (desktop sidebar, converted to an animated bottom sheet on mobile screens < 1024px).
   - Filters: Animal types, service specialities, Open Now / 24x7 toggles, Emergency care, Home visits, distance slider (0–10 km), minimum star rating, price bands (Budget / Mid / Premium), Verified-only badge toggle, and spoken languages.
-  - List / Map layout toggle (styled interactive placeholder with geographic coordinates).
-  - 13 fictional providers across all 6 service categories with realistic operational details, transparent fee bands, last-verified dates, direct Call/Directions/Book CTAs, and a functional "Submit a correction" modal.
+  - **Interactive Prototype Map**: Scaled SVG pin map plotted from geographic coordinates across Mumbai (Arabian Sea shoreline, arterial expressways, and neighborhood labels). Pins are color-coded by provider category and clickable to highlight the matching provider card.
+  - 13 fictional providers across all 6 service categories with realistic operational details, transparent fee bands, last-verified dates, direct Directions links, an accessible **Booking Modal** (with slot selection saving to `localStorage['practo_booking_requests']`), a simulated Call notification toast for demo clarity, and a functional "Submit a correction" modal.
 - **Trust Strip & How It Works**: 3-step care discovery flow, verified listing commitments, transparent pricing, and zero fake review guarantee.
 - **Supply-Side CTA Band**: High-conversion banner targeting vets and shelter operators.
 
 ### 2. `/learn` — AI Education Landing Page
-- **Outcome-Led Hero**: Value proposition tailored for non-technical learners seeking to 10x their productivity using practical AI.
-- **CTAs**: *"Reserve Your Seat"* (triggers interactive lead capture) and *"Download Syllabus"*.
+- **Outcome-Led Hero**: Value proposition tailored for non-technical learners seeking to dramatically speed up daily workflows using practical AI.
+- **CTAs**: *"Reserve Your Seat"* (triggers full 3-step cohort onboarding modal) and *"Download Syllabus"* (triggers streamlined name+email lead capture that downloads `/syllabus.pdf`).
 - **Target Audience**: Dedicated audience segmentation cards for Students, Working Professionals, Freelancers, and Small Business Owners.
 - **6 Practical Modules**: AI Tools & Prompting, Workflow Automation (Make & n8n), AI Website Construction, High-Velocity Content Creation, Non-Technical Data Analytics, and End-to-End Capstone Project.
 - **Curriculum Timeline**: 6-week vertical progression highlighting milestones.
 - **Ethical Content Standards**: Explicitly labelled placeholder for mentor profile and authentic learner feedback (no fabricated testimonials).
 - **Pricing & Cohort Options**: Transparent cards with `[PRICE]` and `[START DATE]` placeholders.
 - **Accessible FAQ Accordion**: Fully keyboard accessible with animated expansion states.
-- **Sticky Mobile CTA Bar**: Unobtrusive sticky footer button on mobile viewport.
-- **Working 3-Step Lead-Capture Modal**:
-  - **Step 1**: Full name, WhatsApp phone number (validation for 10+ digits), and valid email address.
-  - **Step 2**: Role selection, multi-select skill interests, and preferred cohort batch.
-  - **Step 3**: Confirmation celebration screen with "Join WhatsApp Group" and "Add to Calendar" triggers.
-  - **Data Persistence & Webhook**: Automatically captures all UTM parameters (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`), stores submissions locally in `localStorage['practo_leads']`, and dispatches payloads to `VITE_LEAD_WEBHOOK_URL` if configured.
+- **Sticky Mobile CTA Bar**: Unobtrusive sticky footer button on mobile viewports with adequate page padding preventing content overlap.
+- **Dual-Intent Lead-Capture Modal**:
+  - **For Syllabus Downloads**: Step 1 captures Full Name and Email, directly triggers a download of `/syllabus.pdf`, and confirms submission.
+  - **For Seat Reservation**: Step 1 collects contact info, Step 2 collects role/interests/batch, and Step 3 provides active calendar triggers (Google Calendar template URL and client-side downloadable `.ics` file) alongside WhatsApp group community invite handling via `VITE_WHATSAPP_INVITE_URL`.
+  - **Data Persistence & Webhook**: Captures all UTM parameters (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`), stores submissions locally in `localStorage['practo_leads']`, and dispatches payloads to `VITE_LEAD_WEBHOOK_URL` if configured.
 
 ### 3. `/carousel` — AI-Generated Sample Carousel
 - **Data-Driven Architecture**: Structured in `/src/data/carousel.json` with 7 slides (Hook + 5 Content Slides + CTA) formatted for standard 1080×1350px (4:5 portrait aspect ratio).
 - **Topic**: *"5 Signs Your Dog Needs a Vet Today"*.
-- **Medical Integrity**: Includes mandatory veterinary consultation disclaimer; unverified health claims are prominently tagged with `[SOURCE NEEDED]`.
+- **Medical Integrity**: Includes mandatory veterinary consultation disclaimer; unverified health claims are parsed and displayed with styled amber `Source Needed` badges (`bg-amber-100 text-amber-900 border-amber-300`).
 - **Export Capabilities**:
   - Individual slide PNG export (`slide-1.png` to `slide-7.png`) rendered at full 1080×1350 resolution.
-  - Multi-page PDF compilation (`practo-carousel.pdf`) using `html-to-image` and `jsPDF`.
-  - Ready-to-use exports pre-compiled in `/exports`.
+  - Multi-page compressed PDF compilation (`practo-carousel.pdf`, ~0.63 MB) using JPEG compression (quality 0.9) to ensure fast email and mobile downloads.
 
 ### 4. `/workflow` — Content Automation Pipeline & Strategy Write-Up
 - **Interactive 10-Node Flow Diagram**: Visual left-to-right flow (responsive vertical stacking on mobile) mapping Idea Capture (Tally/Airtable) → Make/n8n trigger → Claude AI structuring → Copy constraints → Brand styling → Template autofill → Team approval → Asset export → Buffer/Metricool scheduling → Central content calendar logging.
@@ -88,7 +86,7 @@ The application will be live at `http://localhost:5173`.
 | Token | Value | Rationale |
 |---|---|---|
 | Background Cream | `#FBF8F3` | Warm, calming surface reducing clinical anxiety for pet owners |
-| Primary Ink | `#1F2A2E` | Deep slate-teal providing WCAG AAA contrast (12:1) over cream |
+| Primary Ink | `#1F2A2E` | Deep slate-teal providing WCAG AAA contrast (13.8:1) over cream |
 | Primary Teal | `#0F766E` | Grounded, trustworthy healthcare tone (WCAG AA compliant) |
 | Accent Amber | `#F59E0B` | Warm golden amber reserved for primary action CTAs |
 | Surface Mint | `#EEF5F3` | Subtle cool tinted surface for cards and category chips |
@@ -99,40 +97,9 @@ The application will be live at `http://localhost:5173`.
 
 ### Accessibility & Interaction Highlights
 - **Touch Targets**: All interactive elements (buttons, inputs, category tiles, close buttons) have a minimum touch footprint of 44×44px.
-- **Contrast Ratios**: Verified contrast ratios ≥ 4.5:1 for body copy and ≥ 3:1 for large display elements.
-- **No Fabricated Social Proof**: No fake reviews, star counts with fictitious testimonials, or false platform volume stats. Placeholders are honestly labelled.
+- **Contrast Ratios**: Body text and metadata use `#6B7280` (`text-gray-500`) or darker, ensuring WCAG AA compliance (≥ 4.5:1).
+- **Reduced Motion Support**: Smooth scrolling behavior automatically respects `prefers-reduced-motion`.
 - **Modal Accessibility**: Modals implement keyboard focus trapping, `Escape` key listeners, background scroll locking, and ARIA dialog semantics.
-
----
-
-## Technology Stack Rationale
-
-1. **Vite + React 19 + TypeScript**: Instant HMR, robust compile-time type safety, and clean modern component architecture.
-2. **Tailwind CSS v4 (`@tailwindcss/vite`)**: CSS variables native integration, design token enforcement, zero runtime overhead.
-3. **React Router v7**: Declarative client-side routing with lazy-loaded route chunking for performance.
-4. **Framer Motion**: Lightweight micro-interactions (modal entrance, bottom sheet gestures, staggered cards) without bloat.
-5. **Lucide React**: Clean, consistent icon set replacing generic emojis.
-6. **html-to-image + jsPDF**: In-browser pixel-perfect client-side slide rendering and vector-aligned PDF compilation.
-7. **LocalStorage + Webhook Architecture**: Resilient dual-write lead capture enabling immediate offline-first demo functionality with webhook readiness.
-
----
-
-## Key Assumptions
-
-1. **Local-First Mock Data**: Since no external database or backend was specified, all 13 providers, course curricula, and carousel slides are structured as strongly-typed, schema-compliant JSON/TypeScript modules in `/src/data`.
-2. **Deterministic Fictional Identity**: All veterinary clinic names, addresses, and phone numbers are completely fictional to prevent impersonating actual clinical establishments.
-3. **Medical Disclaimer**: Veterinary advice content must strictly display a non-diagnostic disclaimer and flag unsourced claims (`[SOURCE NEEDED]`) for editorial review.
-4. **Lead Webhook**: The lead form looks for `import.meta.env.VITE_LEAD_WEBHOOK_URL`; if absent, it gracefully saves to `localStorage` and succeeds.
-
----
-
-## What I'd Build Next
-
-1. **Provider Self-Serve Portal**: Listing claim verification flow with clinic license upload and profile management.
-2. **Real-time Appointment Slot Booking**: Calendar sync with Google Calendar/Outlook and SMS/WhatsApp appointment reminders.
-3. **Verified-Visit Review System**: Cryptographically or OTP-verified patient check-in reviews to maintain authentic reviews.
-4. **AI Triage Symptom Assistant**: Conversational agent assisting anxious owners in determining whether a situation is an emergency or routine visit.
-5. **Geospatial Map Integration**: Integration with Mapbox or Google Maps with real-time distance calculations and route directions.
 
 ---
 

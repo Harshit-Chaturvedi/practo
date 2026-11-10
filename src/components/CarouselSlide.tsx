@@ -87,15 +87,16 @@ function renderBody(text: string, scale: number) {
           <span
             key={i}
             style={{
-              backgroundColor: '#FEF3C7',
-              padding: `${2 * scale}px ${8 * scale}px`,
-              borderRadius: 6 * scale,
-              fontSize: 24 * scale,
-              fontStyle: 'italic',
+              padding: `${3 * scale}px ${10 * scale}px`,
+              borderRadius: 8 * scale,
+              fontSize: 22 * scale,
+              marginLeft: 8 * scale,
+              display: 'inline-block',
+              verticalAlign: 'middle',
             }}
-            className="text-amber-dark"
+            className="bg-amber-100 text-amber-900 border border-amber-300 font-semibold uppercase tracking-wider"
           >
-            {part}
+            Source Needed
           </span>
         ) : (
           <span key={i}>{part}</span>
