@@ -62,7 +62,27 @@ The application will be live at `http://localhost:5173`.
 - **Dual-Intent Lead-Capture Modal**:
   - **For Syllabus Downloads**: Step 1 captures Full Name and Email, directly triggers a download of `/syllabus.pdf`, and confirms submission.
   - **For Seat Reservation**: Step 1 collects contact info, Step 2 collects role/interests/batch, and Step 3 provides active calendar triggers (Google Calendar template URL and client-side downloadable `.ics` file) alongside WhatsApp group community invite handling via `VITE_WHATSAPP_INVITE_URL`.
-  - **Data Persistence & Webhook**: Captures all UTM parameters (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`), stores submissions locally in `localStorage['practo_leads']`, and dispatches payloads to `VITE_LEAD_WEBHOOK_URL` if configured.
+  - **Client-Side Persistence & Resilient Webhook**: Submissions are guaranteed to be saved first to `localStorage['practo_leads']`. Asynchronously, a JSON payload is dispatched to `VITE_LEAD_WEBHOOK_URL` with `Content-Type: text/plain;charset=utf-8` (preventing CORS preflight delays), a 5-second timeout, and an automated retry. Failures are handled completely silently so the user experience is never blocked.
+  - **Serverless Ingestion**: A pre-built Google Apps Script webhook receiver is included in [`google-apps-script/Code.gs`](google-apps-script/Code.gs). See [`docs/LEAD_WEBHOOK_SETUP.md`](docs/LEAD_WEBHOOK_SETUP.md) for 2-minute step-by-step setup instructions.
+
+#### Webhook Payload Specification
+Every submission sent to `VITE_LEAD_WEBHOOK_URL` delivers a clean JSON payload matching this schema:
+
+| Field | Type | Description / Sample |
+|---|---|---|
+| `timestamp` | `string` | ISO 8601 formatted timestamp (`"2026-11-10T22:30:00.000Z"`) |
+| `name` | `string` | Learner full name (`"Priya Sharma"`) |
+| `whatsapp` | `string` | Contact phone number (`"9820012345"`, empty for syllabus-only) |
+| `email` | `string` | Verified email address (`"priya@example.com"`) |
+| `role` | `string` | Self-reported background (`"Working Professional"`, `"Student"`, etc.) |
+| `interests` | `string` | Comma-separated list (`"AI Tools & Prompting, Workflow Automation"`) |
+| `batch` | `string` | Cohort preference (`"weekend-morning"`, `"weekday-evening"`) |
+| `intent` | `string` | User intent flag (`"seat"` or `"syllabus"`) |
+| `utm_source` | `string` | URL query attribution (`"linkedin"`, `"newsletter"`, etc.) |
+| `utm_medium` | `string` | Marketing medium (`"social"`, `"cpc"`, `"email"`) |
+| `utm_campaign` | `string` | Marketing campaign tag (`"launch_batch_1"`) |
+| `page` | `string` | Current route path (`"/learn"`) |
+| `company` | `string` | Hidden honeypot field (empty for humans; non-empty drops request) |
 
 ### 3. `/carousel` — AI-Generated Sample Carousel
 - **Data-Driven Architecture**: Structured in `/src/data/carousel.json` with 7 slides (Hook + 5 Content Slides + CTA) formatted for standard 1080×1350px (4:5 portrait aspect ratio).
