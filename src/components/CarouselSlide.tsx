@@ -80,21 +80,21 @@ function renderBody(text: string, scale: number) {
         fontSize: 32 * scale,
         lineHeight: 1.65,
       }}
-      className="font-body text-current"
+      className="font-body text-ink/90"
     >
       {parts.map((part, i) =>
         part === '[SOURCE NEEDED]' ? (
           <span
             key={i}
             style={{
-              padding: `${3 * scale}px ${10 * scale}px`,
+              padding: `${4 * scale}px ${12 * scale}px`,
               borderRadius: 8 * scale,
-              fontSize: 22 * scale,
+              fontSize: 20 * scale,
               marginLeft: 8 * scale,
               display: 'inline-block',
               verticalAlign: 'middle',
             }}
-            className="bg-amber-100 text-amber-900 border border-amber-300 font-semibold uppercase tracking-wider"
+            className="bg-amber-100 text-amber-950 border border-amber-300 font-heading font-bold uppercase tracking-wider shadow-xs"
           >
             Source Needed
           </span>
@@ -111,34 +111,53 @@ function renderBody(text: string, scale: number) {
 /* ------------------------------------------------------------------ */
 
 function BrandingFooter({
-  text,
-  color,
   scale,
+  isDark = false,
 }: {
-  text: string
-  color: string
   scale: number
+  isDark?: boolean
 }) {
   return (
     <div
-      className="flex items-center justify-center gap-2"
-      style={{ gap: 10 * scale }}
+      className="flex items-center justify-between w-full border-t pt-4"
+      style={{
+        borderColor: isDark ? 'rgba(255,255,255,0.2)' : '#E3E0D8',
+        paddingTop: 24 * scale,
+      }}
     >
-      <PawPrint
-        size={28 * scale}
-        style={{ color }}
-        aria-hidden="true"
-      />
+      <div className="flex items-center" style={{ gap: 10 * scale }}>
+        <div
+          className="rounded-full flex items-center justify-center text-white"
+          style={{
+            width: 36 * scale,
+            height: 36 * scale,
+            backgroundColor: isDark ? '#F59E0B' : '#0F766E',
+            color: isDark ? '#1F2A2E' : '#FFFFFF',
+          }}
+        >
+          <PawPrint size={20 * scale} />
+        </div>
+        <span
+          style={{
+            fontSize: 22 * scale,
+            color: isDark ? '#FFFFFF' : '#1F2A2E',
+            letterSpacing: '-0.01em',
+          }}
+          className="font-heading font-bold"
+        >
+          Practo <span style={{ color: isDark ? '#F59E0B' : '#0F766E' }}>for Animals</span>
+        </span>
+      </div>
+
       <span
         style={{
-          fontSize: 24 * scale,
-          color,
-          opacity: 0.85,
-          letterSpacing: '0.02em',
+          fontSize: 20 * scale,
+          color: isDark ? 'rgba(255,255,255,0.85)' : '#4B5563',
+          fontWeight: 600,
         }}
-        className="font-heading font-semibold"
+        className="font-heading"
       >
-        {text}
+        @practoforanimals
       </span>
     </div>
   )
@@ -160,32 +179,62 @@ function HookSlideContent({
       className="flex flex-col items-center justify-between h-full w-full"
       style={{
         padding: 80 * scale,
-        backgroundColor: slide.bgColor,
-        color: slide.textColor,
+        backgroundColor: '#0B4F4A', // Deep brand teal
+        color: '#FFFFFF',
       }}
     >
-      {/* top spacer */}
-      <div aria-hidden="true" />
+      {/* top indicator */}
+      <div className="w-full flex items-center justify-between">
+        <span
+          className="font-heading font-bold uppercase tracking-wider"
+          style={{
+            fontSize: 20 * scale,
+            color: '#F59E0B',
+            backgroundColor: 'rgba(245, 158, 11, 0.15)',
+            border: `${1 * scale}px solid rgba(245, 158, 11, 0.4)`,
+            padding: `${6 * scale}px ${16 * scale}px`,
+            borderRadius: 20 * scale,
+          }}
+        >
+          Care Guide
+        </span>
+        <span
+          className="font-heading font-semibold"
+          style={{ fontSize: 20 * scale, color: 'rgba(255,255,255,0.7)' }}
+        >
+          Swipe ➔
+        </span>
+      </div>
 
       {/* centre content */}
       <div className="flex flex-col items-center text-center" style={{ gap: 32 * scale }}>
-        <PawPrint size={80 * scale} style={{ color: slide.textColor, opacity: 0.3 }} aria-hidden="true" />
+        <div
+          className="rounded-full flex items-center justify-center"
+          style={{
+            width: 130 * scale,
+            height: 130 * scale,
+            backgroundColor: 'rgba(255,255,255,0.1)',
+            border: `${2 * scale}px solid rgba(255,255,255,0.2)`,
+          }}
+        >
+          <PawPrint size={72 * scale} style={{ color: '#F59E0B' }} aria-hidden="true" />
+        </div>
         <h2
-          className="font-heading font-bold leading-tight"
+          className="font-heading font-extrabold leading-[1.12] text-white"
           style={{ fontSize: 72 * scale }}
         >
           {slide.headline}
         </h2>
         <p
           className="font-body"
-          style={{ fontSize: 36 * scale, opacity: 0.85 }}
+          style={{ fontSize: 36 * scale, color: '#EEF5F3', maxWidth: 840 * scale }}
         >
           {slide.subheadline}
         </p>
       </div>
 
       {/* footer */}
-      <BrandingFooter text={slide.footer} color={slide.textColor} scale={scale} />
+      <BrandingFooter scale={scale} isDark />
     </div>
   )
 }
@@ -207,8 +256,8 @@ function ContentSlideContent({
     <div
       className="flex flex-col justify-between h-full w-full relative overflow-hidden"
       style={{
-        backgroundColor: slide.bgColor,
-        color: slide.textColor,
+        backgroundColor: '#FBF8F3', // Cream token
+        color: '#1F2A2E',           // Ink token
         padding: 80 * scale,
       }}
     >
@@ -216,8 +265,8 @@ function ContentSlideContent({
       <div
         className="absolute left-0 top-0 bottom-0"
         style={{
-          width: 12 * scale,
-          backgroundColor: slide.accentColor,
+          width: 14 * scale,
+          backgroundColor: slide.accentColor === '#DC2626' ? '#DC2626' : '#0F766E',
         }}
         aria-hidden="true"
       />
@@ -225,13 +274,13 @@ function ContentSlideContent({
       {/* top row: number badge + icon */}
       <div className="flex items-start justify-between" style={{ paddingLeft: 16 * scale }}>
         <div
-          className="flex items-center justify-center font-heading font-bold text-white"
+          className="flex items-center justify-center font-heading font-extrabold text-white shadow-xs"
           style={{
-            width: 72 * scale,
-            height: 72 * scale,
-            borderRadius: '50%',
-            backgroundColor: slide.accentColor,
-            fontSize: 36 * scale,
+            width: 76 * scale,
+            height: 76 * scale,
+            borderRadius: 20 * scale,
+            backgroundColor: slide.accentColor === '#DC2626' ? '#DC2626' : '#0F766E',
+            fontSize: 38 * scale,
           }}
           aria-label={`Slide ${slide.number}`}
         >
@@ -239,11 +288,23 @@ function ContentSlideContent({
         </div>
 
         {Icon && (
-          <Icon
-            size={64 * scale}
-            style={{ color: slide.accentColor, opacity: 0.2 }}
-            aria-hidden="true"
-          />
+          <div
+            className="flex items-center justify-center rounded-[18px]"
+            style={{
+              width: 76 * scale,
+              height: 76 * scale,
+              backgroundColor: '#EEF5F3',
+              border: `${1.5 * scale}px solid #E3E0D8`,
+            }}
+          >
+            <Icon
+              size={44 * scale}
+              style={{
+                color: slide.accentColor === '#DC2626' ? '#DC2626' : '#0F766E',
+              }}
+              aria-hidden="true"
+            />
+          </div>
         )}
       </div>
 
@@ -252,11 +313,8 @@ function ContentSlideContent({
         className="flex flex-col"
         style={{ gap: 28 * scale, paddingLeft: 16 * scale }}
       >
-        {Icon && (
-          <Icon size={56 * scale} style={{ color: slide.accentColor }} aria-hidden="true" />
-        )}
         <h2
-          className="font-heading font-bold leading-tight"
+          className="font-heading font-extrabold leading-[1.15] text-ink"
           style={{ fontSize: 52 * scale }}
         >
           {slide.headline}
@@ -266,7 +324,7 @@ function ContentSlideContent({
 
       {/* footer branding */}
       <div style={{ paddingLeft: 16 * scale }}>
-        <BrandingFooter text="Practo for Animals" color={slide.accentColor} scale={scale} />
+        <BrandingFooter scale={scale} isDark={false} />
       </div>
     </div>
   )
@@ -288,38 +346,56 @@ function CtaSlideContent({
       className="flex flex-col items-center justify-between h-full w-full"
       style={{
         padding: 80 * scale,
-        backgroundColor: slide.bgColor,
-        color: slide.textColor,
+        backgroundColor: '#0B4F4A', // Deep brand teal
+        color: '#FFFFFF',
       }}
     >
-      {/* top spacer */}
-      <div aria-hidden="true" />
+      {/* top indicator */}
+      <div className="w-full flex items-center justify-end">
+        <span
+          className="font-heading font-semibold"
+          style={{ fontSize: 20 * scale, color: 'rgba(255,255,255,0.7)' }}
+        >
+          Share this with a pet parent ↗
+        </span>
+      </div>
 
       {/* centre content */}
-      <div className="flex flex-col items-center text-center" style={{ gap: 40 * scale }}>
-        <PawPrint size={72 * scale} style={{ color: slide.textColor, opacity: 0.3 }} aria-hidden="true" />
+      <div className="flex flex-col items-center text-center" style={{ gap: 36 * scale }}>
+        <div
+          className="rounded-full flex items-center justify-center"
+          style={{
+            width: 120 * scale,
+            height: 120 * scale,
+            backgroundColor: 'rgba(255,255,255,0.1)',
+            border: `${2 * scale}px solid rgba(255,255,255,0.2)`,
+          }}
+        >
+          <PawPrint size={64 * scale} style={{ color: '#F59E0B' }} aria-hidden="true" />
+        </div>
         <h2
-          className="font-heading font-bold leading-tight"
+          className="font-heading font-extrabold leading-[1.15] text-white"
           style={{ fontSize: 64 * scale }}
         >
           {slide.headline}
         </h2>
         <p
           className="font-body"
-          style={{ fontSize: 34 * scale, opacity: 0.85 }}
+          style={{ fontSize: 34 * scale, color: '#EEF5F3', maxWidth: 840 * scale }}
         >
           {slide.subheadline}
         </p>
 
-        {/* CTA button */}
+        {/* CTA button (Amber token) */}
         <div
-          className="font-heading font-bold"
+          className="font-heading font-bold shadow-lg"
           style={{
             backgroundColor: '#F59E0B',
             color: '#1F2A2E',
-            padding: `${24 * scale}px ${64 * scale}px`,
+            padding: `${22 * scale}px ${60 * scale}px`,
             borderRadius: 16 * scale,
-            fontSize: 36 * scale,
+            fontSize: 34 * scale,
+            letterSpacing: '-0.01em',
           }}
           role="presentation"
         >
@@ -329,21 +405,21 @@ function CtaSlideContent({
 
       {/* bottom: disclaimer + footer */}
       <div
-        className="flex flex-col items-center text-center"
+        className="flex flex-col items-center text-center w-full"
         style={{ gap: 20 * scale }}
       >
         <p
           className="font-body"
           style={{
             fontSize: 20 * scale,
-            opacity: 0.6,
-            maxWidth: 800 * scale,
+            color: 'rgba(255,255,255,0.85)',
+            maxWidth: 820 * scale,
             lineHeight: 1.5,
           }}
         >
           {slide.disclaimer}
         </p>
-        <BrandingFooter text={slide.footer} color={slide.textColor} scale={scale} />
+        <BrandingFooter scale={scale} isDark />
       </div>
     </div>
   )

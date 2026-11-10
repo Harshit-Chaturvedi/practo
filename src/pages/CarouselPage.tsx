@@ -1,9 +1,10 @@
 import { useRef, useState, useCallback } from 'react'
 import { toPng, toJpeg } from 'html-to-image'
 import { jsPDF } from 'jspdf'
-import { Download, FileDown, Loader2, Image as ImageIcon } from 'lucide-react'
+import { Download, FileDown, Loader2, Sparkles } from 'lucide-react'
 import CarouselSlide, { type SlideData } from '@/components/CarouselSlide'
 import carouselData from '@/data/carousel.json'
+import { Container, SectionHeader, Button, Badge } from '@/components/ui'
 
 /* ------------------------------------------------------------------ */
 /*  Types for the JSON structure                                       */
@@ -121,100 +122,99 @@ export default function CarouselPage() {
   /* ---- Render ---------------------------------------------------- */
 
   return (
-    <section className="bg-cream min-h-screen">
+    <main className="bg-cream min-h-screen">
       {/* -------- page header -------- */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-          <div>
-            <h1 className="font-heading text-3xl sm:text-4xl font-bold text-ink">
-              AI-Generated Content Carousel
-            </h1>
-            <p className="mt-2 text-gray-500 text-base max-w-xl">
-              Sample social media carousel — data-driven slides from JSON
-            </p>
+      <div className="border-b border-border bg-surface/70 backdrop-blur-sm">
+        <Container size="default" className="py-12 sm:py-16">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+            <div>
+              <div className="inline-flex items-center gap-2 mb-3">
+                <Badge variant="teal">AI Content Generation</Badge>
+                <Badge variant="neutral">Instagram 4:5 Portrait</Badge>
+              </div>
+              <h1 className="font-heading text-3xl sm:text-5xl font-extrabold text-ink tracking-tight">
+                AI Social Carousel Preview
+              </h1>
+              <p className="mt-3 text-text-muted text-base max-w-xl leading-relaxed">
+                Structured clinical awareness slides generated programmatically from schema-validated JSON with lossless multi-format exports.
+              </p>
+            </div>
+
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={handleExportPdf}
+              disabled={exportingPdf}
+              leftIcon={exportingPdf ? <Loader2 size={18} className="animate-spin" /> : <FileDown size={18} />}
+              className="shrink-0 shadow-sm"
+            >
+              {exportingPdf ? 'Compiling PDF…' : 'Export Full Deck (PDF)'}
+            </Button>
           </div>
 
-          <button
-            type="button"
-            onClick={handleExportPdf}
-            disabled={exportingPdf}
-            aria-label="Export all slides as PDF"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-[14px]
-                       bg-teal text-white font-heading font-semibold text-sm
-                       hover:bg-teal-dark active:scale-[0.97] transition
-                       disabled:opacity-60 disabled:cursor-not-allowed
-                       min-h-[44px] shrink-0 cursor-pointer"
-          >
-            {exportingPdf ? (
-              <Loader2 size={18} className="animate-spin" aria-hidden="true" />
-            ) : (
-              <FileDown size={18} aria-hidden="true" />
-            )}
-            {exportingPdf ? 'Generating PDF…' : 'Export All as PDF'}
-          </button>
-        </div>
-
-        {/* topic badge */}
-        <div className="mt-5 inline-flex items-center gap-2 bg-surface border border-border rounded-chip px-4 py-2">
-          <ImageIcon size={16} className="text-teal" aria-hidden="true" />
-          <span className="font-heading text-sm font-semibold text-ink">
-            {data.topic}
-          </span>
-          <span className="text-gray-500 text-sm">
-            · {data.slides.length} slides · 1080 × 1350
-          </span>
-        </div>
+          {/* Topic strip */}
+          <div className="mt-8 flex flex-wrap items-center gap-3 bg-white border border-border rounded-[14px] px-5 py-3 shadow-xs">
+            <Sparkles size={16} className="text-teal shrink-0" aria-hidden="true" />
+            <span className="font-heading text-sm font-bold text-ink">
+              Topic: {data.topic}
+            </span>
+            <span className="text-text-muted text-xs sm:text-sm">
+              • {data.slides.length} slides • 1080 × 1350px • Manrope + Inter Design Tokens
+            </span>
+          </div>
+        </Container>
       </div>
 
       {/* -------- slide preview strip (horizontally scrollable) -------- */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <Container size="default" className="py-12 sm:py-16">
+        <SectionHeader
+          eyebrow="Interactive Strip"
+          title="Slide Preview Deck"
+          description="Rendered at scaled 4:5 aspect ratio. Click 'Export PNG' for individual 1080×1350 assets or use the PDF builder above."
+          align="left"
+          className="mb-8"
+        />
+
         <div
-          className="flex gap-6 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory
-                     scrollbar-thin"
+          className="flex gap-6 overflow-x-auto pb-8 pt-2 snap-x snap-mandatory scrollbar-thin"
           role="list"
           aria-label="Carousel slide previews"
         >
           {data.slides.map((slide, idx) => (
             <div
               key={slide.number}
-              className="flex flex-col items-center gap-3 snap-start"
+              className="flex flex-col items-center gap-3 snap-start shrink-0"
               role="listitem"
             >
               {/* label */}
-              <span className="text-xs font-heading font-semibold text-gray-500 uppercase tracking-wider">
+              <Badge variant="neutral" className="text-xs uppercase tracking-wider font-bold">
                 {slide.type === 'hook'
-                  ? 'Hook'
+                  ? 'Slide 1: Hook'
                   : slide.type === 'cta'
-                    ? 'CTA'
-                    : `Slide ${slide.number}`}
-              </span>
+                    ? 'Slide 7: CTA'
+                    : `Slide ${slide.number + 1}: Content`}
+              </Badge>
 
               {/* preview card */}
-              <CarouselSlide slide={slide} />
+              <div className="rounded-[16px] overflow-hidden shadow-md ring-1 ring-border">
+                <CarouselSlide slide={slide} />
+              </div>
 
               {/* export button */}
-              <button
-                type="button"
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => handleExportPng(idx)}
                 disabled={exportingSlide === idx}
-                aria-label={`Export slide ${slide.number} as PNG`}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-button
-                           border border-border bg-white text-ink font-body text-xs
-                           font-medium hover:bg-surface active:scale-[0.97] transition
-                           disabled:opacity-60 disabled:cursor-not-allowed
-                           min-h-[44px] cursor-pointer"
+                leftIcon={exportingSlide === idx ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+                className="w-full text-xs"
               >
-                {exportingSlide === idx ? (
-                  <Loader2 size={14} className="animate-spin" aria-hidden="true" />
-                ) : (
-                  <Download size={14} aria-hidden="true" />
-                )}
-                Export PNG
-              </button>
+                {exportingSlide === idx ? 'Generating…' : 'Export PNG'}
+              </Button>
             </div>
           ))}
         </div>
-      </div>
+      </Container>
 
       {/* -------- hidden full-size slides for export capture -------- */}
       <div
@@ -233,6 +233,6 @@ export default function CarouselPage() {
           />
         ))}
       </div>
-    </section>
+    </main>
   )
 }

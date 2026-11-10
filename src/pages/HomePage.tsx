@@ -13,21 +13,22 @@ import {
   X,
   ChevronDown,
   List,
-  Map,
+  Map as MapIcon,
   Star,
   ShieldCheck,
   IndianRupee,
   Users,
-  Ambulance,
   SearchX,
+  Sparkles,
 } from 'lucide-react'
 import { providers, animalTypes, languageOptions } from '@/data/providers'
 import type { Provider } from '@/data/providers'
 import ProviderCard from '@/components/ProviderCard'
 import InteractiveMap from '@/components/InteractiveMap'
+import { Container, Button, SectionHeader, ToggleSwitch } from '@/components/ui'
 
 // ---------------------------------------------------------------------------
-// Types
+// Types & Constants
 // ---------------------------------------------------------------------------
 
 type ProviderType = Provider['type']
@@ -38,20 +39,17 @@ type PriceBand = 'budget' | 'mid' | 'premium'
 interface CategoryTile {
   id: ProviderType
   label: string
+  description: string
   icon: React.ComponentType<{ size?: number; className?: string }>
 }
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
 const CATEGORY_TILES: CategoryTile[] = [
-  { id: 'clinic', label: 'Clinics', icon: Stethoscope },
-  { id: 'hospital', label: 'Hospitals', icon: Building2 },
-  { id: 'boarding', label: 'Boarding', icon: Home },
-  { id: 'diagnostics', label: 'Diagnostics', icon: Microscope },
-  { id: 'ambulance', label: 'Ambulances', icon: Siren },
-  { id: 'ngo', label: 'NGOs & Shelters', icon: Heart },
+  { id: 'clinic', label: 'Clinics', description: 'Consultations & checkups', icon: Stethoscope },
+  { id: 'hospital', label: 'Hospitals', description: '24/7 ICU & surgery', icon: Building2 },
+  { id: 'boarding', label: 'Boarding', description: 'Overnight & daycare', icon: Home },
+  { id: 'diagnostics', label: 'Diagnostics', description: 'X-Ray, blood tests & scans', icon: Microscope },
+  { id: 'ambulance', label: 'Ambulances', description: 'Emergency transport', icon: Siren },
+  { id: 'ngo', label: 'NGOs & Shelters', description: 'Rescue & adoptions', icon: Heart },
 ]
 
 const NEED_OPTIONS = [
@@ -77,29 +75,29 @@ const ANIMAL_DROPDOWN_OPTIONS = [
 const HOW_STEPS = [
   {
     number: 1,
-    title: 'Search',
-    description: 'Tell us your location, animal type, and what you need.',
+    title: 'Search Needs & Location',
+    description: 'Filter verified veterinary clinics, emergency hospitals, or boarding by your pet and neighborhood.',
     icon: Search,
   },
   {
     number: 2,
-    title: 'Compare',
-    description: 'Browse verified providers with transparent details.',
+    title: 'Compare Clear Pricing',
+    description: 'Review transparent consultation fees, verified hours, spoken languages, and treatment capabilities.',
     icon: SlidersHorizontal,
   },
   {
     number: 3,
-    title: 'Connect',
-    description: 'Call, get directions, or book directly.',
-    icon: Ambulance,
+    title: 'Book or Call Instantly',
+    description: 'Reserve prototype appointment slots, get one-tap directions, or reach out to emergency helplines.',
+    icon: Stethoscope,
   },
 ]
 
 const TRUST_ITEMS = [
-  { label: 'Verified listings', icon: ShieldCheck },
-  { label: 'Transparent pricing', icon: IndianRupee },
-  { label: 'No fake reviews', icon: Star },
-  { label: 'Community-powered', icon: Users },
+  { label: 'Verified clinical listings', icon: ShieldCheck, detail: 'Manual review cycle' },
+  { label: 'Transparent fee bands', icon: IndianRupee, detail: 'No hidden charges' },
+  { label: 'Zero fabricated reviews', icon: Star, detail: 'Authentic records only' },
+  { label: 'Community-led data', icon: Users, detail: 'Crowdsourced corrections' },
 ]
 
 // ---------------------------------------------------------------------------
@@ -141,18 +139,17 @@ function SelectField({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex min-h-[44px] w-full items-center gap-2 rounded-[var(--radius-input)] border border-border bg-white px-3.5 py-2.5 text-left text-sm transition-colors hover:border-teal focus-visible:outline-2 focus-visible:outline-teal"
-        aria-label={ariaLabel}
+        className="flex min-h-[44px] w-full items-center gap-2 rounded-[12px] border border-border bg-white px-3.5 py-2.5 text-left text-sm transition-colors hover:border-teal focus-visible:outline-teal"
         aria-expanded={open}
         aria-haspopup="listbox"
       >
         {icon}
-        <span className={value ? 'text-ink' : 'text-gray-500'}>
+        <span className={value ? 'text-ink font-medium' : 'text-text-muted'}>
           {value || label}
         </span>
         <ChevronDown
           size={16}
-          className={`ml-auto text-gray-500 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`ml-auto text-text-muted transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
         />
       </button>
       <AnimatePresence>
@@ -160,7 +157,7 @@ function SelectField({
           <motion.ul
             role="listbox"
             aria-label={ariaLabel}
-            className="absolute left-0 right-0 top-full z-30 mt-1 max-h-56 overflow-y-auto rounded-[var(--radius-input)] border border-border bg-white py-1 shadow-md"
+            className="absolute left-0 right-0 top-full z-30 mt-1 max-h-56 overflow-y-auto rounded-[12px] border border-border bg-white py-1 shadow-md"
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
@@ -169,7 +166,7 @@ function SelectField({
             <li
               role="option"
               aria-selected={!value}
-              className="min-h-[44px] cursor-pointer px-3.5 py-2.5 text-sm text-gray-500 hover:bg-surface"
+              className="min-h-[40px] cursor-pointer px-3.5 py-2 text-sm text-text-muted hover:bg-surface"
               onClick={() => {
                 onChange('')
                 setOpen(false)
@@ -182,14 +179,16 @@ function SelectField({
               }}
               tabIndex={0}
             >
-              All
+              All {label}s
             </li>
             {options.map((opt) => (
               <li
                 key={opt}
                 role="option"
                 aria-selected={value === opt}
-                className={`min-h-[44px] cursor-pointer px-3.5 py-2.5 text-sm transition-colors hover:bg-surface ${value === opt ? 'bg-surface font-medium text-teal' : 'text-ink'}`}
+                className={`min-h-[40px] cursor-pointer px-3.5 py-2 text-sm transition-colors hover:bg-surface ${
+                  value === opt ? 'bg-teal-50 font-semibold text-teal-800' : 'text-ink'
+                }`}
                 onClick={() => {
                   onChange(opt)
                   setOpen(false)
@@ -213,41 +212,7 @@ function SelectField({
 }
 
 // ---------------------------------------------------------------------------
-// Toggle Switch
-// ---------------------------------------------------------------------------
-
-interface ToggleSwitchProps {
-  checked: boolean
-  onChange: (val: boolean) => void
-  label: string
-}
-
-function ToggleSwitch({ checked, onChange, label }: ToggleSwitchProps) {
-  return (
-    <label className="flex cursor-pointer items-center justify-between gap-3 text-sm">
-      <span className="text-ink">{label}</span>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={checked}
-        aria-label={label}
-        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal ${
-          checked ? 'bg-teal' : 'bg-gray-300'
-        }`}
-        onClick={() => onChange(!checked)}
-      >
-        <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
-            checked ? 'translate-x-6' : 'translate-x-1'
-          }`}
-        />
-      </button>
-    </label>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// HomePage
+// HomePage Component
 // ---------------------------------------------------------------------------
 
 export default function HomePage() {
@@ -306,7 +271,6 @@ export default function HomePage() {
 
   // Hero search handler
   const handleSearch = useCallback(() => {
-    // Apply hero bar selections to filters
     if (animalDropdown) {
       setFilterAnimals([animalDropdown])
     }
@@ -361,26 +325,22 @@ export default function HomePage() {
   const filteredProviders = useMemo(() => {
     let result = [...providers]
 
-    // Category tile
     if (activeCategory) {
       result = result.filter((p) => p.type === activeCategory)
     }
 
-    // Animal filter
     if (filterAnimals.length > 0) {
       result = result.filter((p) =>
         filterAnimals.some((a) => p.animals.includes(a))
       )
     }
 
-    // Service filter
     if (filterServices.length > 0) {
       result = result.filter((p) =>
         filterServices.some((s) => p.services.includes(s))
       )
     }
 
-    // Need dropdown
     if (needDropdown) {
       const need = needDropdown.toLowerCase()
       result = result.filter(
@@ -394,43 +354,37 @@ export default function HomePage() {
       )
     }
 
-    // Toggles
     if (openNow) result = result.filter((p) => p.isOpen)
     if (is24x7) result = result.filter((p) => p.is24x7)
     if (hasEmergency) result = result.filter((p) => p.hasEmergency)
     if (hasHomeVisit) result = result.filter((p) => p.hasHomeVisit)
     if (verifiedOnly) result = result.filter((p) => p.verified)
 
-    // Distance
     if (maxDistance < 10) {
       result = result.filter((p) => p.distanceKm <= maxDistance)
     }
 
-    // Rating
     if (minRating > 0) {
       result = result.filter((p) => p.rating >= minRating)
     }
 
-    // Price band (heuristic based on fee text)
     if (priceBand) {
       result = result.filter((p) => {
         const fee = p.feeRange.toLowerCase()
         if (priceBand === 'budget')
-          return fee.includes('free') || fee.startsWith('₹') && !fee.includes('5,000') && !fee.includes('10,000') && !fee.includes('8,000') && !fee.includes('4,000')
+          return fee.includes('free') || (fee.startsWith('₹') && !fee.includes('5,000') && !fee.includes('10,000') && !fee.includes('8,000') && !fee.includes('4,000'))
         if (priceBand === 'premium')
           return fee.includes('5,000') || fee.includes('10,000') || fee.includes('8,000') || fee.includes('4,000')
-        return true // mid = show all
+        return true
       })
     }
 
-    // Languages
     if (filterLanguages.length > 0) {
       result = result.filter((p) =>
         filterLanguages.some((l) => p.languages.includes(l))
       )
     }
 
-    // Sort
     switch (sortBy) {
       case 'nearest':
         result.sort((a, b) => a.distanceKm - b.distanceKm)
@@ -462,21 +416,21 @@ export default function HomePage() {
   ])
 
   // ---------------------------------------------------------------------------
-  // Filter Panel Content (shared between desktop sidebar and mobile sheet)
+  // Filter Panel Content
   // ---------------------------------------------------------------------------
   function renderFilterPanel() {
     return (
       <div className="flex flex-col gap-6">
         {/* Animal type checkboxes */}
         <fieldset>
-          <legend className="mb-2 font-heading text-sm font-semibold text-ink">
+          <legend className="mb-2 font-heading text-xs uppercase tracking-wider font-bold text-ink">
             Animal Type
           </legend>
           <div className="flex flex-col gap-1.5">
             {animalTypes.map((animal) => (
               <label
                 key={animal}
-                className="flex min-h-[36px] cursor-pointer items-center gap-2 text-sm text-ink"
+                className="flex min-h-[36px] cursor-pointer items-center gap-2.5 text-sm text-ink hover:text-teal transition-colors"
               >
                 <input
                   type="checkbox"
@@ -484,9 +438,9 @@ export default function HomePage() {
                   onChange={() =>
                     toggleCheckbox(animal, filterAnimals, setFilterAnimals)
                   }
-                  className="h-4 w-4 rounded border-border text-teal accent-teal"
+                  className="h-4 w-4 rounded border-border text-teal accent-teal focus-visible:outline-teal"
                 />
-                {animal}
+                <span>{animal}</span>
               </label>
             ))}
           </div>
@@ -494,14 +448,14 @@ export default function HomePage() {
 
         {/* Service type checkboxes */}
         <fieldset>
-          <legend className="mb-2 font-heading text-sm font-semibold text-ink">
-            Service Type
+          <legend className="mb-2 font-heading text-xs uppercase tracking-wider font-bold text-ink">
+            Service Specialities
           </legend>
-          <div className="flex max-h-48 flex-col gap-1.5 overflow-y-auto">
+          <div className="flex max-h-48 flex-col gap-1.5 overflow-y-auto pr-1">
             {allServiceNames.map((service) => (
               <label
                 key={service}
-                className="flex min-h-[36px] cursor-pointer items-center gap-2 text-sm text-ink"
+                className="flex min-h-[36px] cursor-pointer items-center gap-2.5 text-sm text-ink hover:text-teal transition-colors"
               >
                 <input
                   type="checkbox"
@@ -509,46 +463,46 @@ export default function HomePage() {
                   onChange={() =>
                     toggleCheckbox(service, filterServices, setFilterServices)
                   }
-                  className="h-4 w-4 rounded border-border text-teal accent-teal"
+                  className="h-4 w-4 rounded border-border text-teal accent-teal focus-visible:outline-teal"
                 />
-                {service}
+                <span>{service}</span>
               </label>
             ))}
           </div>
         </fieldset>
 
         {/* Toggles */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2 border-t border-border pt-4">
           <ToggleSwitch
             checked={openNow}
             onChange={setOpenNow}
             label="Open Now"
           />
-          <ToggleSwitch checked={is24x7} onChange={setIs24x7} label="24×7" />
+          <ToggleSwitch checked={is24x7} onChange={setIs24x7} label="24×7 Operations" />
           <ToggleSwitch
             checked={hasEmergency}
             onChange={setHasEmergency}
-            label="Emergency"
+            label="Emergency Ready"
           />
           <ToggleSwitch
             checked={hasHomeVisit}
             onChange={setHasHomeVisit}
-            label="Home Visit"
+            label="Home Visit Available"
           />
           <ToggleSwitch
             checked={verifiedOnly}
             onChange={setVerifiedOnly}
-            label="Verified Only"
+            label="Verified Listings Only"
           />
         </div>
 
         {/* Distance slider */}
-        <div>
+        <div className="border-t border-border pt-4">
           <label
             htmlFor="distance-slider"
-            className="mb-2 block font-heading text-sm font-semibold text-ink"
+            className="mb-2 block font-heading text-xs uppercase tracking-wider font-bold text-ink"
           >
-            Max Distance: {maxDistance} km
+            Max Distance: <span className="text-teal font-extrabold">{maxDistance} km</span>
           </label>
           <input
             id="distance-slider"
@@ -558,31 +512,28 @@ export default function HomePage() {
             step={0.5}
             value={maxDistance}
             onChange={(e) => setMaxDistance(Number(e.target.value))}
-            className="w-full accent-teal"
+            className="w-full accent-teal cursor-pointer"
           />
-          <div className="flex justify-between text-xs text-gray-500">
+          <div className="flex justify-between text-xs text-text-muted mt-1 font-medium">
             <span>0 km</span>
             <span>10 km</span>
           </div>
         </div>
 
-        {/* Rating */}
-        <div>
-          <label
-            htmlFor="rating-slider"
-            className="mb-2 block font-heading text-sm font-semibold text-ink"
-          >
-            Min Rating: {minRating > 0 ? `${minRating}+` : 'Any'}
-          </label>
-          <div className="flex gap-1">
+        {/* Rating buttons */}
+        <div className="border-t border-border pt-4">
+          <span className="mb-2 block font-heading text-xs uppercase tracking-wider font-bold text-ink">
+            Minimum Rating
+          </span>
+          <div className="flex gap-1.5">
             {[0, 3, 3.5, 4, 4.5].map((r) => (
               <button
                 key={r}
                 type="button"
                 onClick={() => setMinRating(r)}
-                className={`min-h-[36px] min-w-[44px] rounded-[var(--radius-button)] border px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-teal ${
+                className={`min-h-[38px] flex-1 rounded-[10px] border text-xs font-heading font-semibold transition-colors focus-visible:outline-teal ${
                   minRating === r
-                    ? 'border-teal bg-teal text-white'
+                    ? 'border-teal bg-teal text-white shadow-xs'
                     : 'border-border bg-white text-ink hover:bg-surface'
                 }`}
                 aria-label={r === 0 ? 'Any rating' : `Minimum ${r} stars`}
@@ -594,26 +545,26 @@ export default function HomePage() {
         </div>
 
         {/* Price Band */}
-        <div>
-          <span className="mb-2 block font-heading text-sm font-semibold text-ink">
-            Price Band
+        <div className="border-t border-border pt-4">
+          <span className="mb-2 block font-heading text-xs uppercase tracking-wider font-bold text-ink">
+            Fee Tier
           </span>
-          <div className="flex gap-1.5">
+          <div className="grid grid-cols-2 gap-1.5">
             {(
               [
-                { id: null as PriceBand | null, label: 'All' },
+                { id: null as PriceBand | null, label: 'All Tiers' },
                 { id: 'budget' as PriceBand, label: 'Budget' },
-                { id: 'mid' as PriceBand, label: 'Mid' },
-                { id: 'premium' as PriceBand, label: 'Premium' },
+                { id: 'mid' as PriceBand, label: 'Standard' },
+                { id: 'premium' as PriceBand, label: 'Specialist' },
               ] as const
             ).map((band) => (
               <button
                 key={band.label}
                 type="button"
                 onClick={() => setPriceBand(band.id)}
-                className={`min-h-[36px] rounded-[var(--radius-button)] border px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-teal ${
+                className={`min-h-[38px] rounded-[10px] border px-2 py-1 text-xs font-heading font-semibold transition-colors focus-visible:outline-teal ${
                   priceBand === band.id
-                    ? 'border-teal bg-teal text-white'
+                    ? 'border-teal bg-teal text-white shadow-xs'
                     : 'border-border bg-white text-ink hover:bg-surface'
                 }`}
               >
@@ -624,15 +575,15 @@ export default function HomePage() {
         </div>
 
         {/* Languages */}
-        <fieldset>
-          <legend className="mb-2 font-heading text-sm font-semibold text-ink">
-            Languages
+        <fieldset className="border-t border-border pt-4">
+          <legend className="mb-2 font-heading text-xs uppercase tracking-wider font-bold text-ink">
+            Spoken Languages
           </legend>
           <div className="flex flex-col gap-1.5">
             {languageOptions.map((lang) => (
               <label
                 key={lang}
-                className="flex min-h-[36px] cursor-pointer items-center gap-2 text-sm text-ink"
+                className="flex min-h-[36px] cursor-pointer items-center gap-2.5 text-sm text-ink hover:text-teal transition-colors"
               >
                 <input
                   type="checkbox"
@@ -640,9 +591,9 @@ export default function HomePage() {
                   onChange={() =>
                     toggleCheckbox(lang, filterLanguages, setFilterLanguages)
                   }
-                  className="h-4 w-4 rounded border-border text-teal accent-teal"
+                  className="h-4 w-4 rounded border-border text-teal accent-teal focus-visible:outline-teal"
                 />
-                {lang}
+                <span>{lang}</span>
               </label>
             ))}
           </div>
@@ -657,117 +608,157 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-cream">
       {/* ================================================================ */}
-      {/* 1. HERO SECTION                                                  */}
+      {/* 1. HERO SECTION (Split Layout)                                   */}
       {/* ================================================================ */}
-      <section
-        className="bg-surface px-4 pb-14 pt-12 sm:px-6 md:pb-20 md:pt-16"
-        aria-label="Hero"
-      >
-        <div className="mx-auto max-w-4xl text-center">
-          <motion.h1
-            className="font-heading text-3xl font-bold leading-tight text-ink sm:text-4xl md:text-5xl"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            Find trusted animal care near you
-          </motion.h1>
-          <motion.p
-            className="mx-auto mt-4 max-w-2xl text-base text-gray-500 sm:text-lg"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            Discover verified clinics, hospitals, boarding, diagnostics,
-            ambulances, and shelters for your pets and animals.
-          </motion.p>
+      <section className="bg-surface border-b border-border py-14 sm:py-20" aria-label="Hero">
+        <Container>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            {/* Left Column: Search & Mission (7 cols) */}
+            <div className="lg:col-span-7 space-y-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-heading font-bold uppercase tracking-wider">
+                <Sparkles size={14} className="text-teal" />
+                Verified Animal Healthcare Directory
+              </div>
 
-          {/* Search bar */}
-          <motion.div
-            className="mx-auto mt-8 flex max-w-3xl flex-col gap-3 sm:flex-row sm:items-stretch"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            {/* Location input */}
-            <div className="relative flex-1 min-w-[160px]">
-              <MapPin
-                size={18}
-                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500"
-              />
-              <input
-                type="text"
-                value={locationQuery}
-                onChange={(e) => setLocationQuery(e.target.value)}
-                placeholder="Location"
-                aria-label="Search by location"
-                className="min-h-[44px] w-full rounded-[var(--radius-input)] border border-border bg-white py-2.5 pl-10 pr-3.5 text-sm text-ink placeholder:text-gray-500 transition-colors focus:border-teal focus:ring-1 focus:ring-teal focus-visible:outline-none"
-              />
+              <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-ink tracking-tight leading-[1.12]">
+                Find trusted animal care near you
+              </h1>
+
+              <p className="text-text-muted text-base sm:text-lg max-w-xl leading-relaxed">
+                Connect with verified clinics, 24/7 emergency veterinary hospitals, boarding sanctuaries, diagnostics, and animal welfare shelters across Mumbai.
+              </p>
+
+              {/* 3-Field Search Card */}
+              <div className="rounded-[20px] border border-border bg-white p-4 sm:p-5 shadow-md space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Location input */}
+                  <div className="relative">
+                    <MapPin
+                      size={18}
+                      className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-teal"
+                    />
+                    <input
+                      type="text"
+                      value={locationQuery}
+                      onChange={(e) => setLocationQuery(e.target.value)}
+                      placeholder="Neighborhood or pin"
+                      aria-label="Search by location"
+                      className="min-h-[44px] w-full rounded-[12px] border border-border bg-white py-2.5 pl-10 pr-3.5 text-sm text-ink placeholder:text-text-muted/60 transition-colors focus:border-teal focus:ring-2 focus:ring-teal/20 focus-visible:outline-none"
+                    />
+                  </div>
+
+                  {/* Animal dropdown */}
+                  <SelectField
+                    label="Animal Type"
+                    value={animalDropdown}
+                    options={ANIMAL_DROPDOWN_OPTIONS}
+                    onChange={setAnimalDropdown}
+                    ariaLabel="Select animal type"
+                  />
+
+                  {/* Need dropdown */}
+                  <SelectField
+                    label="Care Need"
+                    value={needDropdown}
+                    options={NEED_OPTIONS}
+                    onChange={setNeedDropdown}
+                    ariaLabel="Select what you need"
+                  />
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2 border-t border-border/60">
+                  {/* Emergency chip */}
+                  <button
+                    type="button"
+                    onClick={handleEmergencyClick}
+                    className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[12px] bg-red-emergency px-4 py-2.5 text-xs sm:text-sm font-heading font-bold text-white shadow-xs hover:bg-red-700 transition-colors focus-visible:outline-red-emergency"
+                    aria-label="Emergency — Find Ambulance"
+                  >
+                    <Siren size={17} />
+                    Emergency / Find Ambulance
+                  </button>
+
+                  {/* Primary Find Vet CTA */}
+                  <Button
+                    variant="primary"
+                    size="md"
+                    onClick={handleSearch}
+                    leftIcon={<Search size={18} />}
+                  >
+                    Find a Vet
+                  </Button>
+                </div>
+              </div>
             </div>
 
-            {/* Animal type dropdown */}
-            <SelectField
-              label="Animal Type"
-              value={animalDropdown}
-              options={ANIMAL_DROPDOWN_OPTIONS}
-              onChange={setAnimalDropdown}
-              ariaLabel="Select animal type"
-            />
+            {/* Right Column: Purposeful Healthtech Illustration (5 cols) */}
+            <div className="lg:col-span-5 hidden lg:flex justify-center">
+              <div className="relative w-full max-w-md aspect-square rounded-[24px] bg-gradient-to-br from-white to-teal-50 border border-border p-8 shadow-lg flex flex-col justify-between overflow-hidden">
+                {/* Background decorative rings */}
+                <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-teal-100/50 -z-0" />
+                <div className="absolute -left-12 -bottom-12 w-48 h-48 rounded-full bg-amber-100/40 -z-0" />
 
-            {/* Need dropdown */}
-            <SelectField
-              label="Need"
-              value={needDropdown}
-              options={NEED_OPTIONS}
-              onChange={setNeedDropdown}
-              ariaLabel="Select what you need"
-            />
+                <div className="relative z-10 space-y-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-teal-800 text-xs font-heading font-bold shadow-xs border border-border">
+                    <ShieldCheck size={14} className="text-teal" />
+                    Transparent Standards
+                  </span>
+                  <h3 className="font-heading text-xl font-bold text-ink">
+                    Clinical integrity meets modern discovery
+                  </h3>
+                  <p className="text-xs text-text-muted leading-relaxed">
+                    Designed for anxious pet parents needing immediate clarity: zero fabricated reviews, real verified fee bands, and live operational hours.
+                  </p>
+                </div>
 
-            {/* CTA */}
-            <button
-              type="button"
-              onClick={handleSearch}
-              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[var(--radius-button)] bg-teal px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
-              aria-label="Find a Vet"
-            >
-              <Search size={18} />
-              Find a Vet
-            </button>
-          </motion.div>
+                {/* SVG Illustration: Medical cross + heart + pet paw */}
+                <div className="relative z-10 py-6 flex items-center justify-center">
+                  <svg width="180" height="140" viewBox="0 0 180 140" fill="none" className="drop-shadow-md">
+                    {/* Stethoscope arc */}
+                    <path
+                      d="M30 30 C30 90, 80 110, 90 110 C100 110, 150 90, 150 30"
+                      stroke="#0F766E"
+                      strokeWidth="5"
+                      strokeLinecap="round"
+                    />
+                    <circle cx="30" cy="30" r="8" fill="#14B8A6" />
+                    <circle cx="150" cy="30" r="8" fill="#14B8A6" />
+                    {/* Center shield badge */}
+                    <rect x="65" y="45" width="50" height="55" rx="10" fill="#FFFFFF" stroke="#E3E0D8" strokeWidth="2" />
+                    {/* Heart & cross inside */}
+                    <path d="M90 60 v25 M77.5 72.5 h25" stroke="#0F766E" strokeWidth="4" strokeLinecap="round" />
+                    <circle cx="90" cy="118" r="10" fill="#F59E0B" />
+                  </svg>
+                </div>
 
-          {/* Emergency chip */}
-          <motion.div
-            className="mt-5"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.35 }}
-          >
-            <button
-              type="button"
-              onClick={handleEmergencyClick}
-              className="inline-flex min-h-[44px] items-center gap-2 rounded-[var(--radius-chip)] bg-red-emergency px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-emergency"
-              aria-label="Emergency — Find Ambulance"
-            >
-              <Siren size={18} />
-              Emergency / Find Ambulance
-            </button>
-          </motion.div>
-        </div>
+                <div className="relative z-10 grid grid-cols-2 gap-2 text-[11px] font-heading font-semibold text-ink border-t border-border/80 pt-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <span>13 Verified Providers</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    <span>Real-time Mumbai Map</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Container>
       </section>
 
       {/* ================================================================ */}
       {/* 2. CATEGORY TILES                                                */}
       {/* ================================================================ */}
-      <section
-        id="services"
-        className="px-4 py-10 sm:px-6 md:py-14"
-        aria-label="Browse by category"
-      >
-        <div className="mx-auto max-w-5xl">
-          <h2 className="mb-6 text-center font-heading text-xl font-semibold text-ink sm:text-2xl">
-            Browse by Category
-          </h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      <section id="services" className="py-16 sm:py-20" aria-label="Browse by category">
+        <Container>
+          <SectionHeader
+            eyebrow="Specialised Care"
+            title="Browse by Care Category"
+            description="Explore dedicated veterinary infrastructure mapped by emergency readiness, in-patient facilities, and diagnostic gear."
+          />
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
             {CATEGORY_TILES.map((tile) => {
               const Icon = tile.icon
               const isActive = activeCategory === tile.id
@@ -776,169 +767,166 @@ export default function HomePage() {
                   key={tile.id}
                   type="button"
                   onClick={() => handleCategoryClick(tile.id)}
-                  className={`group flex min-h-[88px] flex-col items-center justify-center gap-2 rounded-[var(--radius-card)] border px-3 py-4 text-sm font-medium transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal ${
+                  className={`group flex min-h-[120px] flex-col items-center justify-center p-4 rounded-[16px] border text-center transition-all duration-200 focus-visible:outline-teal ${
                     isActive
                       ? 'border-teal bg-teal text-white shadow-md'
-                      : 'border-border bg-surface text-ink hover:border-teal hover:shadow-sm'
+                      : 'border-border bg-white text-ink hover:border-teal/50 hover:shadow-sm'
                   }`}
                   aria-pressed={isActive}
-                  aria-label={`Filter by ${tile.label}`}
                 >
-                  <Icon
-                    size={28}
-                    className={
-                      isActive
-                        ? 'text-white'
-                        : 'text-teal group-hover:scale-110 transition-transform'
-                    }
-                  />
-                  {tile.label}
+                  <div
+                    className={`w-12 h-12 rounded-[12px] flex items-center justify-center mb-2.5 transition-transform duration-200 group-hover:scale-110 ${
+                      isActive ? 'bg-white/20 text-white' : 'bg-surface text-teal'
+                    }`}
+                  >
+                    <Icon size={24} />
+                  </div>
+                  <span className="font-heading font-bold text-sm leading-snug">
+                    {tile.label}
+                  </span>
+                  <span
+                    className={`text-[11px] mt-1 line-clamp-1 ${
+                      isActive ? 'text-teal-100' : 'text-text-muted'
+                    }`}
+                  >
+                    {tile.description}
+                  </span>
                 </button>
               )
             })}
           </div>
-        </div>
+        </Container>
       </section>
 
       {/* ================================================================ */}
       {/* 3. RESULTS SECTION                                               */}
       {/* ================================================================ */}
-      <section
-        ref={resultsRef}
-        className="px-4 pb-14 sm:px-6"
-        aria-label="Search results"
-      >
-        <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col gap-6 lg:flex-row">
-            {/* --- DESKTOP FILTER SIDEBAR --- */}
-            <aside
-              className="hidden w-72 shrink-0 lg:block"
-              aria-label="Filters"
-            >
-              <div className="sticky top-24 rounded-[var(--radius-card)] border border-border bg-white p-5 shadow-sm">
-                <div className="mb-4 flex items-center justify-between">
-                  <h3 className="font-heading text-base font-semibold text-ink">
-                    Filters
-                  </h3>
+      <section ref={resultsRef} className="pb-20 sm:pb-28" aria-label="Search results">
+        <Container>
+          <div className="flex flex-col lg:flex-row gap-8 items-start">
+            {/* Desktop Filter Sidebar (w-72) */}
+            <aside className="hidden lg:block w-72 shrink-0" aria-label="Filters">
+              <div className="sticky top-24 rounded-[16px] border border-border bg-white p-5 shadow-sm">
+                <div className="mb-4 flex items-center justify-between pb-3 border-b border-border">
+                  <div className="flex items-center gap-1.5 font-heading text-sm font-bold text-ink">
+                    <SlidersHorizontal size={16} className="text-teal" />
+                    <span>Refine Results</span>
+                  </div>
                   <button
                     type="button"
                     onClick={clearAllFilters}
-                    className="min-h-[36px] text-xs font-medium text-teal underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-teal"
+                    className="text-xs font-semibold text-teal hover:underline"
                   >
-                    Clear all
+                    Reset all
                   </button>
                 </div>
                 {renderFilterPanel()}
               </div>
             </aside>
 
-            {/* --- MOBILE FILTER BUTTON + BOTTOM SHEET --- */}
-            <div className="flex items-center gap-3 lg:hidden">
-              <button
-                type="button"
+            {/* Mobile Filter Button */}
+            <div className="flex items-center gap-3 lg:hidden w-full justify-between">
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setMobileFiltersOpen(true)}
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-[var(--radius-button)] border border-border bg-white px-4 py-2.5 text-sm font-medium text-ink shadow-sm transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-teal"
-                aria-label="Open filters"
+                leftIcon={<SlidersHorizontal size={16} />}
               >
-                <SlidersHorizontal size={16} />
-                Filters
-              </button>
+                Filters &amp; Refine ({filteredProviders.length})
+              </Button>
             </div>
 
-            {/* Mobile bottom sheet */}
+            {/* Mobile Bottom Sheet */}
             <AnimatePresence>
               {mobileFiltersOpen && (
-                <motion.div
-                  className="fixed inset-0 z-40 flex flex-col justify-end bg-black/40 lg:hidden"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+                <div
+                  className="fixed inset-0 z-50 flex flex-col justify-end bg-ink/50 backdrop-blur-sm lg:hidden"
                   onClick={(e) => {
-                    if (e.target === e.currentTarget)
-                      setMobileFiltersOpen(false)
+                    if (e.target === e.currentTarget) setMobileFiltersOpen(false)
                   }}
                   role="dialog"
                   aria-modal="true"
-                  aria-label="Filters"
+                  aria-label="Filter listings"
                 >
                   <motion.div
-                    className="max-h-[85vh] overflow-y-auto rounded-t-[var(--radius-modal)] bg-white p-5"
+                    className="max-h-[85vh] overflow-y-auto rounded-t-[20px] bg-white p-5 shadow-xl"
                     initial={{ y: '100%' }}
                     animate={{ y: 0 }}
                     exit={{ y: '100%' }}
-                    transition={{ duration: 0.3, ease: 'easeOut' }}
+                    transition={{ duration: 0.25, ease: 'easeOut' }}
                   >
-                    <div className="mb-4 flex items-center justify-between">
-                      <h3 className="font-heading text-lg font-semibold text-ink">
-                        Filters
+                    <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
+                      <h3 className="font-heading text-base font-bold text-ink">
+                        Refine Providers
                       </h3>
                       <button
                         type="button"
                         onClick={() => setMobileFiltersOpen(false)}
-                        className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-[var(--radius-button)] text-gray-500 hover:bg-surface focus-visible:outline-2 focus-visible:outline-teal"
+                        className="p-2 text-text-muted hover:text-ink"
                         aria-label="Close filters"
                       >
                         <X size={20} />
                       </button>
                     </div>
                     {renderFilterPanel()}
-                    <div className="mt-6 flex gap-3">
-                      <button
-                        type="button"
+                    <div className="mt-6 flex gap-3 border-t border-border pt-4">
+                      <Button
+                        variant="outline"
+                        size="md"
                         onClick={clearAllFilters}
-                        className="min-h-[44px] flex-1 rounded-[var(--radius-button)] border border-border bg-white px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-teal"
+                        className="flex-1"
                       >
                         Clear
-                      </button>
-                      <button
-                        type="button"
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="md"
                         onClick={() => setMobileFiltersOpen(false)}
-                        className="min-h-[44px] flex-1 rounded-[var(--radius-button)] bg-teal px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-dark focus-visible:outline-2 focus-visible:outline-teal"
+                        className="flex-1"
                       >
-                        Apply
-                      </button>
+                        Apply Filters
+                      </Button>
                     </div>
                   </motion.div>
-                </motion.div>
+                </div>
               )}
             </AnimatePresence>
 
-            {/* --- RESULTS AREA --- */}
-            <div className="flex-1">
-              {/* Top bar: count, sort, view toggle */}
-              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm text-gray-500">
-                    <span className="font-semibold text-ink">
+            {/* Main Results Area */}
+            <div className="flex-1 w-full">
+              {/* Header: Result count + Sort + View toggle */}
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-3 bg-white border border-border rounded-[14px] px-4 py-3 shadow-xs">
+                <div className="flex items-center gap-2.5">
+                  <p className="text-sm text-text-muted">
+                    <strong className="font-heading font-bold text-ink">
                       {filteredProviders.length}
-                    </span>{' '}
-                    {filteredProviders.length === 1 ? 'result' : 'results'} found
+                    </strong>{' '}
+                    {filteredProviders.length === 1 ? 'provider' : 'providers'} found
                   </p>
-                  <span className="inline-flex items-center rounded-full bg-amber/15 px-2.5 py-0.5 text-[11px] font-semibold text-amber-900 border border-amber/30">
-                    Demo data
+                  <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-heading font-bold text-amber-900 border border-amber-200">
+                    Demo Pilot
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  {/* Sort */}
+                <div className="flex items-center gap-3">
+                  {/* Sort dropdown */}
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as SortOption)}
-                    className="min-h-[44px] rounded-[var(--radius-input)] border border-border bg-white px-3 py-2 text-sm text-ink focus:border-teal focus:ring-1 focus:ring-teal focus-visible:outline-none"
+                    className="min-h-[40px] rounded-[10px] border border-border bg-white px-3 py-1.5 text-xs sm:text-sm font-heading font-semibold text-ink focus:border-teal focus:ring-1 focus:ring-teal focus-visible:outline-none"
                     aria-label="Sort results"
                   >
-                    <option value="nearest">Nearest</option>
-                    <option value="rating">Rating</option>
-                    <option value="name">Name</option>
+                    <option value="nearest">Nearest First</option>
+                    <option value="rating">Highest Rated</option>
+                    <option value="name">Alphabetical</option>
                   </select>
 
-                  {/* View toggle */}
-                  <div className="flex overflow-hidden rounded-[var(--radius-button)] border border-border">
+                  {/* List / Map View Toggle */}
+                  <div className="flex overflow-hidden rounded-[10px] border border-border">
                     <button
                       type="button"
                       onClick={() => setViewMode('list')}
-                      className={`flex min-h-[44px] min-w-[44px] items-center justify-center px-3 transition-colors focus-visible:outline-2 focus-visible:outline-teal ${
+                      className={`flex min-h-[40px] min-w-[40px] items-center justify-center px-3 transition-colors focus-visible:outline-teal ${
                         viewMode === 'list'
                           ? 'bg-teal text-white'
                           : 'bg-white text-ink hover:bg-surface'
@@ -946,12 +934,12 @@ export default function HomePage() {
                       aria-label="List view"
                       aria-pressed={viewMode === 'list'}
                     >
-                      <List size={18} />
+                      <List size={17} />
                     </button>
                     <button
                       type="button"
                       onClick={() => setViewMode('map')}
-                      className={`flex min-h-[44px] min-w-[44px] items-center justify-center px-3 transition-colors focus-visible:outline-2 focus-visible:outline-teal ${
+                      className={`flex min-h-[40px] min-w-[40px] items-center justify-center px-3 transition-colors focus-visible:outline-teal ${
                         viewMode === 'map'
                           ? 'bg-teal text-white'
                           : 'bg-white text-ink hover:bg-surface'
@@ -959,31 +947,31 @@ export default function HomePage() {
                       aria-label="Map view"
                       aria-pressed={viewMode === 'map'}
                     >
-                      <Map size={18} />
+                      <MapIcon size={17} />
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* View content */}
+              {/* View Output */}
               {viewMode === 'map' ? (
-                <div className="flex flex-col gap-6">
+                <div className="space-y-6">
                   <InteractiveMap
                     providers={filteredProviders}
                     selectedProviderId={selectedMapProviderId}
                     onSelectProvider={(id) => setSelectedMapProviderId(id)}
                   />
                   {filteredProviders.length === 0 ? (
-                    <div className="flex min-h-[160px] flex-col items-center justify-center gap-2 rounded-[var(--radius-card)] border border-border bg-white p-6 text-center">
+                    <div className="flex min-h-[160px] flex-col items-center justify-center gap-2 rounded-[16px] border border-border bg-white p-6 text-center">
                       <SearchX size={32} className="text-gray-300" />
-                      <p className="font-heading text-sm font-semibold text-ink">
+                      <p className="font-heading text-sm font-bold text-ink">
                         No pins match current filters
                       </p>
                     </div>
                   ) : (
-                    <div className="flex flex-col gap-4">
-                      <h4 className="font-heading text-sm font-semibold text-ink">
-                        Providers on this Map ({filteredProviders.length})
+                    <div className="space-y-4">
+                      <h4 className="font-heading text-sm font-bold text-ink uppercase tracking-wider text-text-muted">
+                        Matched Providers on Map ({filteredProviders.length})
                       </h4>
                       {filteredProviders.map((provider, i) => (
                         <ProviderCard
@@ -998,25 +986,20 @@ export default function HomePage() {
                   )}
                 </div>
               ) : filteredProviders.length === 0 ? (
-                <div className="flex min-h-[300px] flex-col items-center justify-center gap-3 rounded-[var(--radius-card)] border border-border bg-white p-8 text-center">
-                  <SearchX size={40} className="text-gray-300" />
-                  <p className="font-heading text-lg font-semibold text-ink">
-                    No results found
+                <div className="flex min-h-[300px] flex-col items-center justify-center gap-3 rounded-[16px] border border-border bg-white p-8 text-center shadow-xs">
+                  <SearchX size={44} className="text-gray-300" />
+                  <h3 className="font-heading text-lg font-bold text-ink">
+                    No matching providers found
+                  </h3>
+                  <p className="max-w-xs text-sm text-text-muted">
+                    Try clearing specialities, extending distance, or clearing animal filters.
                   </p>
-                  <p className="max-w-xs text-sm text-gray-500">
-                    Try adjusting your filters or search criteria to find
-                    providers near you.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={clearAllFilters}
-                    className="mt-2 min-h-[44px] rounded-[var(--radius-button)] border border-teal px-5 py-2.5 text-sm font-medium text-teal transition-colors hover:bg-teal hover:text-white focus-visible:outline-2 focus-visible:outline-teal"
-                  >
-                    Clear all filters
-                  </button>
+                  <Button variant="secondary" size="sm" onClick={clearAllFilters} className="mt-2">
+                    Reset All Filters
+                  </Button>
                 </div>
               ) : (
-                <div className="flex flex-col gap-4">
+                <div className="space-y-4">
                   {filteredProviders.map((provider, i) => (
                     <ProviderCard
                       key={provider.id}
@@ -1028,100 +1011,100 @@ export default function HomePage() {
               )}
             </div>
           </div>
-        </div>
+        </Container>
       </section>
 
       {/* ================================================================ */}
-      {/* 4. HOW IT WORKS                                                  */}
+      {/* 4. HOW IT WORKS (Alternating Background: White)                 */}
       {/* ================================================================ */}
-      <section
-        className="bg-white px-4 py-14 sm:px-6 md:py-20"
-        aria-label="How it works"
-      >
-        <div className="mx-auto max-w-4xl text-center">
-          <h2 className="mb-10 font-heading text-2xl font-bold text-ink sm:text-3xl">
-            How It Works
-          </h2>
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+      <section className="bg-white border-y border-border py-20 sm:py-24" aria-label="How it works">
+        <Container>
+          <SectionHeader
+            eyebrow="Simple Workflow"
+            title="How Practo for Animals Works"
+            description="Built to eliminate guesswork during emergency triage or routine wellness visits."
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {HOW_STEPS.map((step) => {
               const Icon = step.icon
               return (
-                <motion.div
+                <div
                   key={step.number}
-                  className="flex flex-col items-center gap-3"
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.4 }}
-                  transition={{ duration: 0.4, delay: step.number * 0.1 }}
+                  className="flex flex-col items-center text-center p-6 rounded-[16px] bg-surface border border-border/80"
                 >
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-teal text-white shadow-sm">
-                    <span className="font-heading text-lg font-bold">
-                      {step.number}
-                    </span>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-[12px] bg-teal text-white font-heading font-extrabold text-base mb-4 shadow-xs">
+                    {step.number}
                   </div>
-                  <Icon size={28} className="text-teal" />
-                  <h3 className="font-heading text-lg font-semibold text-ink">
+                  <Icon size={24} className="text-teal mb-3" />
+                  <h3 className="font-heading text-lg font-bold text-ink mb-2">
                     {step.title}
                   </h3>
-                  <p className="max-w-xs text-sm text-gray-500">
+                  <p className="text-sm text-text-muted leading-relaxed max-w-xs">
                     {step.description}
                   </p>
-                </motion.div>
+                </div>
               )
             })}
           </div>
-        </div>
+        </Container>
       </section>
 
       {/* ================================================================ */}
-      {/* 5. TRUST STRIP                                                   */}
+      {/* 5. TRUST STRIP (Surface Mint)                                    */}
       {/* ================================================================ */}
-      <section
-        className="bg-surface px-4 py-10 sm:px-6"
-        aria-label="Trust indicators"
-      >
-        <div className="mx-auto grid max-w-4xl grid-cols-2 gap-6 sm:grid-cols-4">
-          {TRUST_ITEMS.map((item) => {
-            const Icon = item.icon
-            return (
-              <div
-                key={item.label}
-                className="flex flex-col items-center gap-2 text-center"
-              >
-                <Icon size={28} className="text-teal" />
-                <span className="text-sm font-medium text-ink">
-                  {item.label}
-                </span>
-              </div>
-            )
-          })}
-        </div>
+      <section className="bg-surface py-14 sm:py-16" aria-label="Trust indicators">
+        <Container>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {TRUST_ITEMS.map((item) => {
+              const Icon = item.icon
+              return (
+                <div
+                  key={item.label}
+                  className="flex flex-col items-center text-center p-4 rounded-[14px] bg-white border border-border/80 shadow-2xs"
+                >
+                  <div className="w-10 h-10 rounded-[10px] bg-teal-50 text-teal flex items-center justify-center mb-2.5">
+                    <Icon size={22} />
+                  </div>
+                  <span className="font-heading font-bold text-sm text-ink leading-tight">
+                    {item.label}
+                  </span>
+                  <span className="text-[11px] text-text-muted mt-0.5">
+                    {item.detail}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </Container>
       </section>
 
       {/* ================================================================ */}
-      {/* 6. LIST YOUR BUSINESS CTA                                        */}
+      {/* 6. LIST YOUR BUSINESS CTA (Dark Teal Band)                       */}
       {/* ================================================================ */}
       <section
         id="list-business"
-        className="bg-teal px-4 py-14 sm:px-6 md:py-20"
+        className="bg-teal-dark border-t border-teal-900 py-18 sm:py-24 text-white"
         aria-label="List your business"
       >
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="font-heading text-2xl font-bold text-white sm:text-3xl">
-            Are you a vet, clinic, or animal service provider?
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-base text-teal-light/90">
-            Join our growing community of trusted animal-care providers. Reach
-            pet parents actively searching for services like yours — completely
-            free.
-          </p>
-          <button
-            type="button"
-            className="mt-8 inline-flex min-h-[44px] items-center gap-2 rounded-[var(--radius-button)] bg-amber px-8 py-3 text-sm font-bold text-ink shadow-sm transition-colors hover:bg-amber-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
-          >
-            List Your Business — It&#39;s Free
-          </button>
-        </div>
+        <Container size="narrow">
+          <div className="text-center space-y-6">
+            <span className="inline-block px-3 py-1 rounded-full bg-teal-900 text-teal-200 text-xs font-heading font-bold uppercase tracking-wider border border-teal-700">
+              Provider Partnership
+            </span>
+            <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
+              Are you a licensed veterinary clinic, shelter, or ambulance operator?
+            </h2>
+            <p className="text-teal-100/90 text-sm sm:text-base leading-relaxed max-w-xl mx-auto">
+              Join our verified directory. Connect with pet owners across your city who are looking for trusted treatments, 24/7 emergency care, and diagnostic appointments.
+            </p>
+            <div className="pt-2">
+              <Button variant="primary" size="lg">
+                List Your Clinic — Free Pilot Enrolment
+              </Button>
+            </div>
+          </div>
+        </Container>
       </section>
     </div>
   )
