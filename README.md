@@ -1,5 +1,12 @@
 # Practo for Animals — Product Development, Design & AI Systems Intern Assignment
 
+> **Live Demo:** [VERCEL URL]  
+> **Production Routes:**  
+> - **`/`** — Practo for Animals MVP (Care Discovery, 3-Field Search, Map & Booking Flow)  
+> - **`/learn`** — Applied AI Course Landing Page (Curriculum, Lead Capture & Syllabus Download)  
+> - **`/carousel`** — AI Social Content Engine (Interactive 1080×1350 Preview, PNG & PDF Exports)  
+> - **`/workflow`** — Content & Data Automation Systems Architecture (Make/n8n Pipelines & Lead CRM)  
+
 An animal-care discovery platform and AI education ecosystem prototype built with **Vite, React 19, TypeScript, Tailwind CSS, React Router, and Framer Motion**.
 
 ---
