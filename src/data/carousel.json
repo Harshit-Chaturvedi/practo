@@ -1,0 +1,77 @@
+{
+  "topic": "5 Signs Your Dog Needs a Vet Today",
+  "disclaimer": "This content is for educational awareness only and is not a substitute for professional veterinary advice. Always consult a licensed veterinarian for your pet's health concerns.",
+  "slides": [
+    {
+      "type": "hook",
+      "number": 0,
+      "headline": "5 Signs Your Dog Needs a Vet Today",
+      "subheadline": "Don't ignore these warning signals",
+      "footer": "Practo for Animals — Trusted Care",
+      "bgColor": "#0F766E",
+      "textColor": "#FFFFFF"
+    },
+    {
+      "type": "content",
+      "number": 1,
+      "headline": "Refusing Food for 24+ Hours",
+      "body": "If your dog skips more than two consecutive meals, it could indicate pain, nausea, or an underlying condition that needs professional evaluation. [SOURCE NEEDED]",
+      "icon": "UtensilsCrossed",
+      "bgColor": "#FBF8F3",
+      "textColor": "#1F2A2E",
+      "accentColor": "#0F766E"
+    },
+    {
+      "type": "content",
+      "number": 2,
+      "headline": "Sudden Lethargy or Weakness",
+      "body": "A normally active dog becoming unusually tired, reluctant to move, or struggling to stand may be experiencing a serious health issue. Seek veterinary attention promptly. [SOURCE NEEDED]",
+      "icon": "Battery",
+      "bgColor": "#FBF8F3",
+      "textColor": "#1F2A2E",
+      "accentColor": "#F59E0B"
+    },
+    {
+      "type": "content",
+      "number": 3,
+      "headline": "Difficulty Breathing",
+      "body": "Rapid, laboured, or noisy breathing, persistent coughing, or blue-tinged gums are emergency signs. Do not wait — visit a vet or call an animal ambulance immediately. [SOURCE NEEDED]",
+      "icon": "Wind",
+      "bgColor": "#FBF8F3",
+      "textColor": "#1F2A2E",
+      "accentColor": "#DC2626"
+    },
+    {
+      "type": "content",
+      "number": 4,
+      "headline": "Repeated Vomiting or Diarrhoea",
+      "body": "Occasional stomach upset may pass, but repeated episodes (more than 2–3 times in a day), especially with blood, require veterinary assessment to rule out infection, toxicity, or obstruction. [SOURCE NEEDED]",
+      "icon": "AlertTriangle",
+      "bgColor": "#FBF8F3",
+      "textColor": "#1F2A2E",
+      "accentColor": "#0F766E"
+    },
+    {
+      "type": "content",
+      "number": 5,
+      "headline": "Swelling, Limping, or Visible Pain",
+      "body": "Unexplained swelling, guarding a body part, yelping when touched, or sudden limping can indicate fractures, joint issues, infections, or insect stings that need diagnosis. [SOURCE NEEDED]",
+      "icon": "Bone",
+      "bgColor": "#FBF8F3",
+      "textColor": "#1F2A2E",
+      "accentColor": "#F59E0B"
+    },
+    {
+      "type": "cta",
+      "number": 6,
+      "headline": "Don't Wait — Find a Vet Now",
+      "subheadline": "Search trusted veterinary care near you",
+      "ctaText": "Visit Practo for Animals",
+      "ctaUrl": "/",
+      "footer": "Practo for Animals — Trusted Care",
+      "disclaimer": "This content is for educational awareness only and is not a substitute for professional veterinary advice.",
+      "bgColor": "#0F766E",
+      "textColor": "#FFFFFF"
+    }
+  ]
+}
