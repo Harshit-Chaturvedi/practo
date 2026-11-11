@@ -2,11 +2,13 @@
 
 Dear Founder,
 
-I have delivered the complete Practo for Animals MVP and AI Education ecosystem as a production-ready, responsive web application across all four routes (live at https://practo-lovat.vercel.app).
+I've built the Practo for Animals MVP and the AI education ecosystem as a responsive, clickable prototype, live at https://practo-lovat.vercel.app (code: https://github.com/Harshit-Chaturvedi/practo).
 
-The platform includes an animal-care discovery engine with 13 realistic providers, 10 dynamic filters, and an interactive Mumbai pin map. It also features an outcome-driven AI course landing page with dual-intent lead capture (instant syllabus download, WhatsApp group invites, and calendar reminders), a 7-slide educational carousel with sub-1MB PDF export, and an automated content workflow strategy blueprint.
+It includes an animal-care discovery page with 13 fictional providers, 10 filters and an interactive Mumbai map; an AI course landing page with a three-step lead-capture flow that writes to a Google Sheet; a 7-slide carousel exportable as PNG and PDF; and a workflow page explaining the content automation and tools.
 
-Key assumptions: provider listings are realistic pilot mocks, unsourced health tips carry visible disclaimers, and lead submissions use resilient offline-first persistence backed by a Google Sheets webhook.
+Assumptions: listings are demo data, booking and corrections are simulated, and health tips carry disclaimers.
+
+Next, I'd add real provider onboarding, booking, and a Make or n8n pipeline for WhatsApp and email follow-ups.
 
 This project was built with AI coding tools (Antigravity and Claude) and reviewed and edited by me.
 
