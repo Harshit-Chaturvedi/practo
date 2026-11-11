@@ -1,9 +1,8 @@
 import { useRef, useState, useCallback } from 'react'
-import { toPng, toJpeg } from 'html-to-image'
-import { jsPDF } from 'jspdf'
-import { Download, FileDown, Loader2, Sparkles } from 'lucide-react'
+import { Download, FileDown, Loader2, Sparkles, ChevronLeft, ChevronRight, Info } from 'lucide-react'
 import CarouselSlide, { type SlideData } from '@/components/CarouselSlide'
 import carouselData from '@/data/carousel.json'
+import SEO from '@/components/SEO'
 import { Container, SectionHeader, Button, Badge } from '@/components/ui'
 
 /* ------------------------------------------------------------------ */
@@ -32,9 +31,52 @@ const SLIDE_H = 1350
 export default function CarouselPage() {
   /* DOM nodes of hidden full-size slides for capturing */
   const exportNodesRef = useRef<(HTMLDivElement | null)[]>([])
+  const scrollerRef = useRef<HTMLDivElement>(null)
 
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0)
   const [exportingSlide, setExportingSlide] = useState<number | null>(null)
   const [exportingPdf, setExportingPdf] = useState(false)
+
+  /* ---- Slide navigation ------------------------------------------ */
+
+  const scrollToSlide = useCallback((index: number) => {
+    const scroller = scrollerRef.current
+    if (!scroller) return
+    const slideElements = scroller.querySelectorAll<HTMLElement>('[role="listitem"]')
+    const target = slideElements[index]
+    if (target) {
+      const left = target.offsetLeft - scroller.offsetLeft
+      scroller.scrollTo({ left, behavior: 'smooth' })
+      setActiveSlideIndex(index)
+    }
+  }, [])
+
+  const handlePrev = useCallback(() => {
+    const next = Math.max(0, activeSlideIndex - 1)
+    scrollToSlide(next)
+  }, [activeSlideIndex, scrollToSlide])
+
+  const handleNext = useCallback(() => {
+    const next = Math.min(data.slides.length - 1, activeSlideIndex + 1)
+    scrollToSlide(next)
+  }, [activeSlideIndex, scrollToSlide])
+
+  const handleScroll = useCallback(() => {
+    const scroller = scrollerRef.current
+    if (!scroller) return
+    const slideElements = scroller.querySelectorAll<HTMLElement>('[role="listitem"]')
+    const scrollLeft = scroller.scrollLeft
+    let closestIndex = 0
+    let minDiff = Infinity
+    slideElements.forEach((el, idx) => {
+      const diff = Math.abs(el.offsetLeft - scroller.offsetLeft - scrollLeft)
+      if (diff < minDiff) {
+        minDiff = diff
+        closestIndex = idx
+      }
+    })
+    setActiveSlideIndex(closestIndex)
+  }, [])
 
   /* ---- helpers --------------------------------------------------- */
 
@@ -42,6 +84,7 @@ export default function CarouselPage() {
     async (index: number): Promise<string> => {
       const node = exportNodesRef.current[index]
       if (!node) throw new Error(`Slide ${index} ref not found`)
+      const { toPng } = await import('html-to-image')
       return toPng(node, {
         width: SLIDE_W,
         height: SLIDE_H,
@@ -81,6 +124,11 @@ export default function CarouselPage() {
   const handleExportPdf = useCallback(async () => {
     setExportingPdf(true)
     try {
+      const [{ toJpeg }, { jsPDF }] = await Promise.all([
+        import('html-to-image'),
+        import('jspdf'),
+      ])
+
       /* Capture all slides as compressed JPEG (quality 0.9) */
       const images: string[] = []
       for (let i = 0; i < data.slides.length; i++) {
@@ -123,6 +171,10 @@ export default function CarouselPage() {
 
   return (
     <main className="bg-cream min-h-screen">
+      <SEO
+        title="Interactive Carousel & Social Slide Studio | Practo for Animals"
+        description="7-slide high-retention social carousel guide for pet emergencies, canine heatstroke care, and verified clinic referrals. Export to PNG and multi-page PDF."
+      />
       {/* -------- page header -------- */}
       <div className="border-b border-border bg-surface/70 backdrop-blur-sm">
         <Container size="default" className="py-12 sm:py-16">
@@ -146,7 +198,7 @@ export default function CarouselPage() {
               onClick={handleExportPdf}
               disabled={exportingPdf}
               leftIcon={exportingPdf ? <Loader2 size={18} className="animate-spin" /> : <FileDown size={18} />}
-              className="shrink-0 shadow-sm"
+              className="shrink-0"
             >
               {exportingPdf ? 'Compiling PDF…' : 'Export Full Deck (PDF)'}
             </Button>
@@ -165,7 +217,7 @@ export default function CarouselPage() {
         </Container>
       </div>
 
-      {/* -------- slide preview strip (horizontally scrollable) -------- */}
+      {/* -------- slide preview deck -------- */}
       <Container size="default" className="py-12 sm:py-16">
         <SectionHeader
           eyebrow="Interactive Strip"
@@ -175,7 +227,62 @@ export default function CarouselPage() {
           className="mb-8"
         />
 
+        {/* Carousel controls bar */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePrev}
+              disabled={activeSlideIndex === 0}
+              aria-label="Previous slide"
+              leftIcon={<ChevronLeft size={16} />}
+            >
+              Prev
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleNext}
+              disabled={activeSlideIndex === data.slides.length - 1}
+              aria-label="Next slide"
+              rightIcon={<ChevronRight size={16} />}
+            >
+              Next
+            </Button>
+            <span className="text-xs font-semibold text-text-muted ml-2">
+              Slide {activeSlideIndex + 1} of {data.slides.length}
+            </span>
+          </div>
+
+          {/* Slide indicator dots */}
+          <div className="flex items-center gap-0.5" role="tablist" aria-label="Slide indicators">
+            {data.slides.map((s, idx) => (
+              <button
+                key={s.number}
+                type="button"
+                role="tab"
+                aria-selected={activeSlideIndex === idx}
+                aria-label={`Go to slide ${idx + 1}: ${s.type}`}
+                onClick={() => scrollToSlide(idx)}
+                className="flex items-center justify-center min-w-[32px] min-h-[36px] p-1 cursor-pointer rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
+              >
+                <span
+                  className={`h-2.5 rounded-full transition-all duration-200 ${
+                    activeSlideIndex === idx
+                      ? 'w-8 bg-teal'
+                      : 'w-2.5 bg-border hover:bg-teal/40'
+                  }`}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* slide preview strip (horizontally scrollable) */}
         <div
+          ref={scrollerRef}
+          onScroll={handleScroll}
           className="flex gap-6 overflow-x-auto pb-8 pt-2 snap-x snap-mandatory scrollbar-thin"
           role="list"
           aria-label="Carousel slide previews"
@@ -213,6 +320,12 @@ export default function CarouselPage() {
               </Button>
             </div>
           ))}
+        </div>
+
+        {/* Disclaimer below carousel */}
+        <div className="mt-4 flex items-center justify-center gap-2 text-center text-xs sm:text-sm text-text-muted">
+          <Info size={16} className="text-teal shrink-0" aria-hidden="true" />
+          <span>Educational content, not a substitute for a veterinarian.</span>
         </div>
       </Container>
 

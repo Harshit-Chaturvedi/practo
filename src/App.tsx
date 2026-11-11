@@ -6,6 +6,7 @@ const HomePage = lazy(() => import('./pages/HomePage'))
 const LearnPage = lazy(() => import('./pages/LearnPage'))
 const CarouselPage = lazy(() => import('./pages/CarouselPage'))
 const WorkflowPage = lazy(() => import('./pages/WorkflowPage'))
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 function LoadingFallback() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/learn" element={<LearnPage />} />
           <Route path="/carousel" element={<CarouselPage />} />
           <Route path="/workflow" element={<WorkflowPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
     </Suspense>

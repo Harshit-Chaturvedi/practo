@@ -91,6 +91,11 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.15;
 }
 
+/* Sticky header offset for hash targets */
+[id] {
+  scroll-margin-top: 5rem;
+}
+
 /* Accessible focus ring */
 *:focus-visible {
   outline: 2px solid var(--color-teal);
@@ -114,4 +119,22 @@ h1, h2, h3, h4, h5, h6 {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #A8A29E;
+}
+
+/* Print and reduced motion overrides: never hide content */
+@media print {
+  [data-reveal],
+  [style*="opacity: 0"],
+  [style*="opacity:0"] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }

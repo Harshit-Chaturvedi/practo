@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react'
-import { motion, type Variants } from 'framer-motion'
+import { useState, useCallback, useRef, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import {
   GraduationCap,
   Briefcase,
@@ -20,7 +20,9 @@ import {
 } from 'lucide-react'
 import { courseModules, faqs, batchOptions } from '@/data/course'
 import LeadCaptureModal from '@/components/LeadCaptureModal'
-import { Container, Button, Card, Badge, SectionHeader } from '@/components/ui'
+import SEO from '@/components/SEO'
+import { Container, Button, Card, Badge, SectionHeader, ScrollReveal } from '@/components/ui'
+import { isAnimationAllowed } from '@/utils/animation'
 
 /* ------------------------------------------------------------------ */
 /*  Icon map                                                           */
@@ -33,19 +35,6 @@ const iconMap: Record<string, LucideIcon> = {
   PenTool,
   BarChart3,
   Trophy,
-}
-
-/* ------------------------------------------------------------------ */
-/*  Animation variants                                                 */
-/* ------------------------------------------------------------------ */
-
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.08, duration: 0.45, ease: 'easeOut' as const },
-  }),
 }
 
 /* ------------------------------------------------------------------ */
@@ -147,6 +136,25 @@ function FAQAccordion() {
 export default function LearnPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [modalIntent, setModalIntent] = useState<'reserve' | 'syllabus'>('reserve')
+  const heroCtaRef = useRef<HTMLDivElement>(null)
+  const [heroCtaInView, setHeroCtaInView] = useState(true)
+
+  useEffect(() => {
+    const el = heroCtaRef.current
+    if (!el || !('IntersectionObserver' in window)) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setHeroCtaInView(entry.isIntersecting)
+      },
+      { threshold: 0.1 }
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  const showStickyBar = !modalOpen && !heroCtaInView
 
   const openReserveModal = useCallback(() => {
     setModalIntent('reserve')
@@ -162,6 +170,10 @@ export default function LearnPage() {
 
   return (
     <>
+      <SEO
+        title="Free AI Content Marketing Masterclass for Animal Care | Practo for Animals"
+        description="Master AI-driven veterinary content marketing. Learn to produce automated, engaging carousels and educational guides that attract and retain pet parents."
+      />
       <main className="bg-cream min-h-screen pb-24 md:pb-12">
         {/* ========== 1. Hero ========== */}
         <section className="relative overflow-hidden bg-teal-dark text-white border-b border-teal-800" aria-label="Course hero">
@@ -178,7 +190,7 @@ export default function LearnPage() {
             </div>
 
             <motion.h1
-              initial={{ opacity: 0, y: 16 }}
+              initial={isAnimationAllowed() ? { opacity: 0, y: 16 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
               className="font-heading text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-[1.15]"
@@ -187,7 +199,7 @@ export default function LearnPage() {
             </motion.h1>
 
             <motion.p
-              initial={{ opacity: 0, y: 16 }}
+              initial={isAnimationAllowed() ? { opacity: 0, y: 16 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
               className="mt-6 text-teal-100 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed"
@@ -197,7 +209,8 @@ export default function LearnPage() {
             </motion.p>
 
             <motion.div
-              initial={{ opacity: 0, y: 16 }}
+              ref={heroCtaRef}
+              initial={isAnimationAllowed() ? { opacity: 0, y: 16 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
               className="mt-8 flex flex-col sm:flex-row gap-3.5 justify-center items-center"
@@ -216,7 +229,7 @@ export default function LearnPage() {
                 size="lg"
                 onClick={openSyllabusModal}
                 leftIcon={<Download size={18} />}
-                className="w-full sm:w-auto text-white border-white/40 hover:bg-white/10"
+                className="w-full sm:w-auto shadow-sm"
               >
                 Download Syllabus
               </Button>
@@ -258,14 +271,7 @@ export default function LearnPage() {
               {whoCards.map((card, i) => {
                 const Icon = card.icon
                 return (
-                  <motion.div
-                    key={card.title}
-                    custom={i}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, amount: 0.3 }}
-                    variants={fadeUp}
-                  >
+                  <ScrollReveal key={card.title} delay={i * 0.08}>
                     <Card variant="surface" className="h-full p-6 text-center hover:border-teal/40 transition-colors">
                       <div className="w-12 h-12 rounded-[14px] bg-teal-50 border border-teal-100 flex items-center justify-center mx-auto text-teal">
                         <Icon size={24} />
@@ -273,7 +279,7 @@ export default function LearnPage() {
                       <h3 className="font-heading font-bold text-ink mt-4 text-lg">{card.title}</h3>
                       <p className="text-text-muted text-sm mt-2 leading-relaxed">{card.description}</p>
                     </Card>
-                  </motion.div>
+                  </ScrollReveal>
                 )
               })}
             </div>
@@ -294,14 +300,7 @@ export default function LearnPage() {
               {courseModules.map((mod, i) => {
                 const Icon = iconMap[mod.icon] || Sparkles
                 return (
-                  <motion.article
-                    key={mod.id}
-                    custom={i}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, amount: 0.2 }}
-                    variants={fadeUp}
-                  >
+                  <ScrollReveal key={mod.id} as="article" delay={i * 0.08} className="h-full">
                     <Card variant="surface" className="h-full p-6 flex flex-col hover:border-teal transition-all">
                       <div className="flex items-center justify-between gap-3 mb-4">
                         <div className="w-10 h-10 rounded-[12px] bg-teal-50 border border-teal-100 flex items-center justify-center text-teal shrink-0">
@@ -331,7 +330,7 @@ export default function LearnPage() {
                         </p>
                       </div>
                     </Card>
-                  </motion.article>
+                  </ScrollReveal>
                 )
               })}
             </div>
@@ -350,20 +349,16 @@ export default function LearnPage() {
 
             <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
               {outcomes.map((outcome, i) => (
-                <motion.div
+                <ScrollReveal
                   key={outcome}
-                  custom={i}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.3 }}
-                  variants={fadeUp}
+                  delay={i * 0.08}
                   className="flex items-start gap-3.5 bg-white border border-border rounded-[16px] p-5 shadow-sm"
                 >
                   <div className="w-8 h-8 rounded-full bg-teal-50 border border-teal-100 flex items-center justify-center shrink-0 mt-0.5">
                     <Check size={16} className="text-teal font-bold" />
                   </div>
                   <span className="text-ink font-semibold text-sm sm:text-base leading-snug">{outcome}</span>
-                </motion.div>
+                </ScrollReveal>
               ))}
             </div>
           </Container>
@@ -386,13 +381,10 @@ export default function LearnPage() {
 
               <ol className="space-y-8">
                 {courseModules.map((mod, i) => (
-                  <motion.li
+                  <ScrollReveal
                     key={mod.id}
-                    custom={i}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, amount: 0.3 }}
-                    variants={fadeUp}
+                    as="li"
+                    delay={i * 0.08}
                     className="relative pl-12"
                   >
                     {/* Circle dot badge */}
@@ -406,7 +398,7 @@ export default function LearnPage() {
                       <h3 className="font-heading font-bold text-ink text-base sm:text-lg mt-0.5">{mod.title}</h3>
                       <p className="text-text-muted text-sm mt-1.5 leading-relaxed">{mod.description}</p>
                     </div>
-                  </motion.li>
+                  </ScrollReveal>
                 ))}
               </ol>
             </div>
@@ -423,13 +415,7 @@ export default function LearnPage() {
               align="center"
             />
 
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4 }}
-              className="mt-10"
-            >
+            <ScrollReveal className="mt-10">
               <Card variant="white" className="p-8 flex flex-col sm:flex-row items-center gap-6 max-w-2xl mx-auto border-border">
                 <div
                   className="w-24 h-24 rounded-full bg-surface border-2 border-dashed border-teal/40 flex items-center justify-center shrink-0"
@@ -456,7 +442,7 @@ export default function LearnPage() {
                   <span className="font-semibold text-ink">Founding Cohort Notice:</span> Student feedback and capstone case studies will be published openly here upon completion of Batch 1. In alignment with our transparency policy, we never generate or publish simulated testimonials.
                 </p>
               </div>
-            </motion.div>
+            </ScrollReveal>
           </Container>
         </section>
 
@@ -472,13 +458,9 @@ export default function LearnPage() {
 
             <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
               {batchOptions.map((batch, i) => (
-                <motion.div
+                <ScrollReveal
                   key={batch.id}
-                  custom={i}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.2 }}
-                  variants={fadeUp}
+                  delay={i * 0.08}
                   className="flex"
                 >
                   <Card
@@ -519,7 +501,7 @@ export default function LearnPage() {
                       </Button>
                     </div>
                   </Card>
-                </motion.div>
+                </ScrollReveal>
               ))}
             </div>
           </Container>
@@ -563,7 +545,7 @@ export default function LearnPage() {
                 size="lg"
                 onClick={openSyllabusModal}
                 leftIcon={<Download size={18} />}
-                className="w-full sm:w-auto text-white border-white/40 hover:bg-white/10"
+                className="w-full sm:w-auto shadow-sm"
               >
                 Download Full Syllabus
               </Button>
@@ -573,7 +555,12 @@ export default function LearnPage() {
       </main>
 
       {/* ========== 10. Sticky Mobile CTA Bar ========== */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-surface/95 backdrop-blur-md border-t border-border px-4 py-3 flex items-center justify-between gap-3 shadow-lg">
+      <div
+        className={`fixed bottom-0 left-0 right-0 z-40 md:hidden bg-surface/95 backdrop-blur-md border-t border-border px-4 py-3 flex items-center justify-between gap-3 shadow-lg transition-transform duration-300 pb-[calc(0.75rem+env(safe-area-inset-bottom))] ${
+          showStickyBar ? 'translate-y-0' : 'translate-y-full pointer-events-none'
+        }`}
+        aria-hidden={!showStickyBar}
+      >
         <div className="min-w-0">
           <p className="font-heading font-bold text-ink text-sm truncate">AI Care Intensive</p>
           <p className="text-xs text-text-muted">Batch 1 enrolment</p>
@@ -583,6 +570,7 @@ export default function LearnPage() {
           size="md"
           onClick={openReserveModal}
           className="shrink-0"
+          tabIndex={showStickyBar ? 0 : -1}
         >
           Reserve Seat
         </Button>

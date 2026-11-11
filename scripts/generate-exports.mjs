@@ -41,6 +41,14 @@ async function run() {
     await page.goto('http://localhost:4173/carousel', { waitUntil: 'networkidle0', timeout: 30000 })
     await new Promise((r) => setTimeout(r, 2000))
 
+    // Hide site header and footer so they never bleed into slide screenshots
+    await page.evaluate(() => {
+      const header = document.querySelector('header')
+      if (header) header.style.display = 'none'
+      const footer = document.querySelector('footer')
+      if (footer) footer.style.display = 'none'
+    })
+
     // Query all hidden full-size slide containers
     // In CarouselPage, they are inside: style="left: -9999px; top: 0"
     // Let's find each slide element by evaluating in page

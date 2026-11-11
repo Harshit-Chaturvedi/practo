@@ -1,81 +1,42 @@
-import { spawn } from 'child_process'
-import path from 'path'
+import { execSync } from 'child_process'
 import fs from 'fs'
+import path from 'path'
 import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const rootDir = path.resolve(__dirname, '..')
-
-const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+const reportsDir = path.join(rootDir, 'audit', 'qa-fixes')
 
 const routes = [
-  { name: 'home', path: '/' },
-  { name: 'learn', path: '/learn' },
-  { name: 'carousel', path: '/carousel' },
-  { name: 'workflow', path: '/workflow' },
+  { name: 'home', url: 'http://localhost:4173/' },
+  { name: 'learn', url: 'http://localhost:4173/learn' },
+  { name: 'carousel', url: 'http://localhost:4173/carousel' },
+  { name: 'workflow', url: 'http://localhost:4173/workflow' },
 ]
 
-async function run() {
-  console.log('Starting preview server on port 4188...')
-  const preview = spawn('npx.cmd', ['vite', 'preview', '--port', '4188'], {
-    cwd: rootDir,
-    stdio: 'pipe',
-    shell: true,
-  })
+console.log('Running Lighthouse mobile audits on 4 routes...')
+const summary = []
 
-  await new Promise((r) => setTimeout(r, 2500))
-
-  const results = {}
-
-  for (const r of routes) {
-    console.log(`Auditing ${r.name} with Lighthouse mobile...`)
-    const url = `http://localhost:4188${r.path}`
-    const outputPath = path.join(rootDir, 'audit', `lh-${r.name}.json`)
-
-    await new Promise((resolve) => {
-      const lh = spawn(
-        'npx.cmd',
-        [
-          'lighthouse',
-          url,
-          '--output=json',
-          `--output-path=${outputPath}`,
-          '--form-factor=mobile',
-          '--screenEmulation.mobile=true',
-          '--throttling-method=provided',
-          '--chrome-flags="--headless=new --no-sandbox --disable-gpu"',
-          `--chrome-path="${chromePath}"`,
-          '--only-categories=performance,accessibility,best-practices,seo',
-          '--quiet',
-        ],
-        {
-          cwd: rootDir,
-          stdio: 'inherit',
-          shell: true,
-        }
-      )
-
-      lh.on('close', () => {
-        resolve()
-      })
+for (const r of routes) {
+  const jsonPath = path.join(reportsDir, `lh-${r.name}.json`)
+  const cmd = `npx lighthouse ${r.url} --form-factor=mobile --screenEmulation.mobile=true --only-categories=performance,accessibility,best-practices,seo --output=json --output-path="${jsonPath}" --chrome-flags="--headless=new --no-sandbox --disable-gpu"`
+  
+  console.log(`Auditing ${r.name} (${r.url})...`)
+  try {
+    execSync(cmd, { stdio: 'pipe' })
+    const data = JSON.parse(fs.readFileSync(jsonPath, 'utf8'))
+    const cats = data.categories
+    summary.push({
+      route: r.name,
+      performance: Math.round(cats.performance.score * 100),
+      accessibility: Math.round(cats.accessibility.score * 100),
+      bestPractices: Math.round(cats['best-practices'].score * 100),
+      seo: Math.round(cats.seo.score * 100),
     })
-
-    if (fs.existsSync(outputPath)) {
-      const report = JSON.parse(fs.readFileSync(outputPath, 'utf8'))
-      results[r.name] = {
-        performance: Math.round((report.categories.performance?.score || 0) * 100),
-        accessibility: Math.round((report.categories.accessibility?.score || 0) * 100),
-        bestPractices: Math.round((report.categories['best-practices']?.score || 0) * 100),
-        seo: Math.round((report.categories.seo?.score || 0) * 100),
-      }
-    }
+  } catch (err) {
+    console.error(`Failed auditing ${r.name}:`, err.message)
   }
-
-  console.log('\n--- LIGHTHOUSE RESULTS ---')
-  console.log(JSON.stringify(results, null, 2))
-
-  preview.kill()
-  process.exit(0)
 }
 
-run()
+console.log('\n--- LIGHTHOUSE MOBILE SCORES ---')
+console.table(summary)

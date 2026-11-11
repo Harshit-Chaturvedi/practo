@@ -75,7 +75,9 @@ export default function InteractiveMap({
                 className="h-2.5 w-2.5 rounded-full"
                 style={{ backgroundColor: color }}
               />
-              <span className="capitalize">{type}</span>
+              <span className={type === 'ngo' ? 'uppercase font-bold' : 'capitalize'}>
+                {type === 'ngo' ? 'NGO' : type}
+              </span>
             </span>
           ))}
         </div>
@@ -273,7 +275,7 @@ export default function InteractiveMap({
               <button
                 type="button"
                 onClick={() => setHoveredId(null)}
-                className="text-gray-400 hover:text-ink text-xs p-1"
+                className="text-text-muted hover:text-ink text-xs p-1"
                 aria-label="Dismiss details"
               >
                 ✕
