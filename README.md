@@ -164,9 +164,9 @@ flowchart TB
     GAS["Google Apps Script Web App"]
     Sheets["Google Sheet Database"]
   end
-  Client -->|Static Assets| Vercel
-  Client -->|Async POST (text/plain)| GAS
-  GAS -->|Append Row| Sheets
+  Client -->|"Static Assets"| Vercel
+  Client -->|"Async POST (text/plain)"| GAS
+  GAS -->|"Append Row"| Sheets
 ```
 
 ### Technology Matrix
