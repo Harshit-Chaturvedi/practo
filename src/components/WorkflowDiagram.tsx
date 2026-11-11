@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import {
   FileText,
   Zap,
@@ -13,6 +12,7 @@ import {
   ChevronRight,
   ChevronDown,
 } from "lucide-react";
+import { ScrollReveal } from "./ui";
 import type { LucideIcon } from "lucide-react";
 
 interface WorkflowNode {
@@ -24,7 +24,7 @@ interface WorkflowNode {
 
 const nodes: WorkflowNode[] = [
   { id: 1, title: "Idea Form", subtitle: "Tally / Airtable", icon: FileText },
-  { id: 2, title: "Automation Trigger", subtitle: "Make / n8n", icon: Zap },
+  { id: 2, title: "Automation Trigger", subtitle: "Google Apps Script / Make", icon: Zap },
   { id: 3, title: "AI Research & Structure", subtitle: "Claude → JSON", icon: Brain },
   { id: 4, title: "Headlines & Copy", subtitle: "Length-limited", icon: Type },
   { id: 5, title: "Visual Direction", subtitle: "Brand kit tokens", icon: Palette },
@@ -32,17 +32,14 @@ const nodes: WorkflowNode[] = [
   { id: 7, title: "Approval", subtitle: "Slack / Telegram", icon: MessageSquare },
   { id: 8, title: "Export", subtitle: "PDF / PNG", icon: Download },
   { id: 9, title: "Scheduling", subtitle: "Buffer / Metricool", icon: Calendar },
-  { id: 10, title: "Content Calendar", subtitle: "Log & track", icon: ClipboardList },
+  { id: 10, title: "Content Calendar", subtitle: "Google Sheet / Airtable", icon: ClipboardList },
 ];
 
 function NodeCard({ node, index }: { node: WorkflowNode; index: number }) {
   const Icon = node.icon;
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.05, duration: 0.35 }}
+    <ScrollReveal
+      delay={index * 0.05}
       className="flex flex-col items-center gap-2 w-full"
     >
       <div
@@ -70,7 +67,7 @@ function NodeCard({ node, index }: { node: WorkflowNode; index: number }) {
           {node.subtitle}
         </p>
       </div>
-    </motion.div>
+    </ScrollReveal>
   );
 }
 
@@ -107,11 +104,34 @@ export default function WorkflowDiagram() {
           ))}
         </div>
 
-        {/* Connector between rows */}
-        <div className="flex justify-end pr-[72px] py-2">
-          <div className="flex flex-col items-center">
-            <div className="h-4 w-0.5 bg-teal/40" />
-            <ChevronDown className="h-4 w-4 text-teal" strokeWidth={2} />
+        {/* Unambiguous Row Flow Connector: Step 5 (Row 1 End) -> Step 6 (Row 2 Start) */}
+        <div className="relative my-4 px-12 max-w-5xl mx-auto">
+          <div className="flex items-center justify-between">
+            {/* Left: Step 6 entry */}
+            <div className="flex flex-col items-center">
+              <ChevronDown className="h-5 w-5 text-teal" strokeWidth={2.5} />
+              <span className="text-[10px] font-bold text-teal font-heading uppercase tracking-wider mt-0.5">
+                Step 6 Begins
+              </span>
+            </div>
+
+            {/* Middle: Horizontal cross-flow line with phase transition badge */}
+            <div className="flex-1 mx-4 relative flex items-center justify-center">
+              <div className="absolute inset-x-0 h-0.5 bg-gradient-to-l from-teal via-teal/40 to-teal" />
+              <div className="relative bg-surface px-4 py-1 text-[11px] font-bold text-teal-dark border border-teal-200 rounded-full shadow-xs flex items-center gap-1.5">
+                <span>Phase 1 (Creation 1–5)</span>
+                <span className="text-teal font-black">➔</span>
+                <span>Phase 2 (Automation 6–10)</span>
+              </div>
+            </div>
+
+            {/* Right: Step 5 exit */}
+            <div className="flex flex-col items-center">
+              <span className="text-[10px] font-bold text-teal font-heading uppercase tracking-wider mb-0.5">
+                From Step 5
+              </span>
+              <div className="h-4 w-0.5 bg-teal" />
+            </div>
           </div>
         </div>
 
@@ -139,10 +159,32 @@ export default function WorkflowDiagram() {
           ))}
         </div>
 
-        <div className="flex justify-end pr-14 py-2">
-          <div className="flex flex-col items-center">
-            <div className="h-3 w-0.5 bg-teal/40" />
-            <ChevronDown className="h-4 w-4 text-teal" strokeWidth={2} />
+        {/* Unambiguous Row Flow Connector: Step 5 (Row 1 End) -> Step 6 (Row 2 Start) */}
+        <div className="relative my-3 px-8">
+          <div className="flex items-center justify-between">
+            {/* Left: Step 6 entry */}
+            <div className="flex flex-col items-center">
+              <ChevronDown className="h-4 w-4 text-teal" strokeWidth={2.5} />
+              <span className="text-[9px] font-bold text-teal font-heading uppercase tracking-wider mt-0.5">
+                Step 6
+              </span>
+            </div>
+
+            {/* Middle: Horizontal line */}
+            <div className="flex-1 mx-3 relative flex items-center justify-center">
+              <div className="absolute inset-x-0 h-0.5 bg-gradient-to-l from-teal via-teal/40 to-teal" />
+              <div className="relative bg-surface px-3 py-0.5 text-[10px] font-bold text-teal-dark border border-teal-200 rounded-full shadow-xs">
+                Phase 1 (1–5) ➔ Phase 2 (6–10)
+              </div>
+            </div>
+
+            {/* Right: Step 5 exit */}
+            <div className="flex flex-col items-center">
+              <span className="text-[9px] font-bold text-teal font-heading uppercase tracking-wider mb-0.5">
+                From Step 5
+              </span>
+              <div className="h-3 w-0.5 bg-teal" />
+            </div>
           </div>
         </div>
 

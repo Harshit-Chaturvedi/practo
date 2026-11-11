@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { X, CheckCircle2 } from 'lucide-react'
+import { X, CheckCircle2, AlertCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface CorrectionModalProps {
@@ -13,24 +13,32 @@ export default function CorrectionModal({ providerName, isOpen, onClose }: Corre
   const [yourEmail, setYourEmail] = useState('')
   const [correction, setCorrection] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [errors, setErrors] = useState<{ name?: string; email?: string; correction?: string }>({})
+
   const overlayRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const firstInputRef = useRef<HTMLInputElement>(null)
+  const openerRef = useRef<HTMLElement | null>(null)
 
   const resetForm = useCallback(() => {
     setYourName('')
     setYourEmail('')
     setCorrection('')
     setSubmitted(false)
+    setErrors({})
   }, [])
 
   const handleClose = useCallback(() => {
     resetForm()
     onClose()
+    setTimeout(() => {
+      openerRef.current?.focus()
+    }, 50)
   }, [resetForm, onClose])
 
   useEffect(() => {
     if (isOpen) {
+      openerRef.current = document.activeElement as HTMLElement
       // Focus first interactive input after open
       const timeout = setTimeout(() => {
         firstInputRef.current?.focus()
@@ -96,6 +104,23 @@ export default function CorrectionModal({ providerName, isOpen, onClose }: Corre
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    const errs: { name?: string; email?: string; correction?: string } = {}
+    if (!yourName.trim()) {
+      errs.name = 'Please enter your name'
+    }
+    if (!yourEmail.trim() || !/^\S+@\S+\.\S+$/.test(yourEmail.trim())) {
+      errs.email = 'Please enter a valid email address'
+    }
+    if (!correction.trim() || correction.trim().length < 5) {
+      errs.correction = 'Please describe what needs correcting (at least 5 characters)'
+    }
+
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs)
+      return
+    }
+
+    setErrors({})
     setSubmitted(true)
     setTimeout(() => {
       handleClose()
@@ -138,8 +163,8 @@ export default function CorrectionModal({ providerName, isOpen, onClose }: Corre
               <button
                 ref={closeButtonRef}
                 onClick={handleClose}
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-[var(--radius-button)] text-gray-500 transition-colors hover:bg-surface hover:text-ink focus-visible:outline-2 focus-visible:outline-teal"
-                aria-label="Close correction modal"
+                className="rounded-lg p-1.5 text-text-muted transition-colors hover:bg-surface hover:text-ink focus-visible:outline-2 focus-visible:outline-teal"
+                aria-label="Close dialog"
               >
                 <X size={20} />
               </button>
@@ -147,22 +172,23 @@ export default function CorrectionModal({ providerName, isOpen, onClose }: Corre
 
             {submitted ? (
               <motion.div
-                className="flex flex-col items-center gap-3 py-8 text-center"
-                initial={{ opacity: 0, scale: 0.9 }}
+                className="py-8 text-center"
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
               >
-                <CheckCircle2 className="text-teal" size={48} />
-                <p className="font-heading text-lg font-semibold text-ink">
-                  Thank you for your feedback!
-                </p>
-                <p className="text-sm text-gray-500">
-                  Your correction has been submitted. We will review it shortly.
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-surface text-teal">
+                  <CheckCircle2 size={32} />
+                </div>
+                <h3 className="font-heading text-lg font-semibold text-ink">
+                  Thank You!
+                </h3>
+                <p className="mt-2 text-sm text-text-muted">
+                  Your correction for <span className="font-medium text-ink">{providerName}</span> has been received. Our team will verify and update the listing.
                 </p>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                {/* Provider name (readonly) */}
+              <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-4">
+                {/* Provider (read-only) */}
                 <div>
                   <label
                     htmlFor="correction-provider"
@@ -191,12 +217,30 @@ export default function CorrectionModal({ providerName, isOpen, onClose }: Corre
                     ref={firstInputRef}
                     id="correction-name"
                     type="text"
-                    required
                     value={yourName}
-                    onChange={(e) => setYourName(e.target.value)}
+                    onChange={(e) => {
+                      setYourName(e.target.value)
+                      if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }))
+                    }}
+                    aria-invalid={Boolean(errors.name)}
+                    aria-describedby={errors.name ? 'correction-name-error' : undefined}
                     placeholder="Enter your name"
-                    className="w-full rounded-[var(--radius-input)] border border-border bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-gray-400 transition-colors focus:border-teal focus:ring-1 focus:ring-teal focus-visible:outline-none"
+                    className={`w-full rounded-[var(--radius-input)] border bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-text-muted/60 transition-colors focus:ring-1 focus-visible:outline-none ${
+                      errors.name
+                        ? 'border-red-emergency focus:border-red-emergency focus:ring-red-emergency'
+                        : 'border-border focus:border-teal focus:ring-teal'
+                    }`}
                   />
+                  {errors.name && (
+                    <p
+                      id="correction-name-error"
+                      aria-live="polite"
+                      className="mt-1 text-xs text-red-emergency font-medium flex items-center gap-1"
+                    >
+                      <AlertCircle size={13} className="shrink-0" />
+                      <span>{errors.name}</span>
+                    </p>
+                  )}
                 </div>
 
                 {/* Your email */}
@@ -210,12 +254,30 @@ export default function CorrectionModal({ providerName, isOpen, onClose }: Corre
                   <input
                     id="correction-email"
                     type="email"
-                    required
                     value={yourEmail}
-                    onChange={(e) => setYourEmail(e.target.value)}
+                    onChange={(e) => {
+                      setYourEmail(e.target.value)
+                      if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }))
+                    }}
+                    aria-invalid={Boolean(errors.email)}
+                    aria-describedby={errors.email ? 'correction-email-error' : undefined}
                     placeholder="you@example.com"
-                    className="w-full rounded-[var(--radius-input)] border border-border bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-gray-400 transition-colors focus:border-teal focus:ring-1 focus:ring-teal focus-visible:outline-none"
+                    className={`w-full rounded-[var(--radius-input)] border bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-text-muted/60 transition-colors focus:ring-1 focus-visible:outline-none ${
+                      errors.email
+                        ? 'border-red-emergency focus:border-red-emergency focus:ring-red-emergency'
+                        : 'border-border focus:border-teal focus:ring-teal'
+                    }`}
                   />
+                  {errors.email && (
+                    <p
+                      id="correction-email-error"
+                      aria-live="polite"
+                      className="mt-1 text-xs text-red-emergency font-medium flex items-center gap-1"
+                    >
+                      <AlertCircle size={13} className="shrink-0" />
+                      <span>{errors.email}</span>
+                    </p>
+                  )}
                 </div>
 
                 {/* What needs correcting */}
@@ -228,13 +290,31 @@ export default function CorrectionModal({ providerName, isOpen, onClose }: Corre
                   </label>
                   <textarea
                     id="correction-text"
-                    required
                     rows={4}
                     value={correction}
-                    onChange={(e) => setCorrection(e.target.value)}
+                    onChange={(e) => {
+                      setCorrection(e.target.value)
+                      if (errors.correction) setErrors((prev) => ({ ...prev, correction: undefined }))
+                    }}
+                    aria-invalid={Boolean(errors.correction)}
+                    aria-describedby={errors.correction ? 'correction-text-error' : undefined}
                     placeholder="Describe the incorrect information and what it should be..."
-                    className="w-full resize-y rounded-[var(--radius-input)] border border-border bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-gray-400 transition-colors focus:border-teal focus:ring-1 focus:ring-teal focus-visible:outline-none"
+                    className={`w-full resize-y rounded-[var(--radius-input)] border bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-text-muted/60 transition-colors focus:ring-1 focus-visible:outline-none ${
+                      errors.correction
+                        ? 'border-red-emergency focus:border-red-emergency focus:ring-red-emergency'
+                        : 'border-border focus:border-teal focus:ring-teal'
+                    }`}
                   />
+                  {errors.correction && (
+                    <p
+                      id="correction-text-error"
+                      aria-live="polite"
+                      className="mt-1 text-xs text-red-emergency font-medium flex items-center gap-1"
+                    >
+                      <AlertCircle size={13} className="shrink-0" />
+                      <span>{errors.correction}</span>
+                    </p>
+                  )}
                 </div>
 
                 <button

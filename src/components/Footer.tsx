@@ -1,44 +1,56 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useRef } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { Heart, Info, ArrowUpRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Container } from './ui/Container'
 
 export default function Footer() {
   const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const location = useLocation()
+  const isLearnPage = location.pathname === '/learn'
 
   const handlePlaceholderClick = (e: React.MouseEvent, label: string) => {
     e.preventDefault()
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current)
+    }
     setToastMessage(`${label} will be live during public release.`)
-    setTimeout(() => {
+    toastTimerRef.current = setTimeout(() => {
       setToastMessage(null)
     }, 3000)
   }
 
   return (
-    <footer className="relative bg-teal-dark text-white border-t border-teal-900">
-      {/* Toast Notification */}
-      <AnimatePresence>
-        {toastMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-[14px] bg-ink px-4 py-3 text-xs font-medium text-white shadow-xl border border-teal-700"
-          >
-            <Info size={16} className="text-amber" />
-            <span>{toastMessage}</span>
-            <button
-              type="button"
-              onClick={() => setToastMessage(null)}
-              className="ml-2 hover:text-white/70"
-              aria-label="Dismiss message"
+    <footer className={`relative bg-teal-dark text-white border-t border-teal-900 ${isLearnPage ? 'pb-24 md:pb-0' : ''}`}>
+      {/* Toast Notification (Single live region — replaces instead of stacking) */}
+      <div role="status" aria-live="polite">
+        <AnimatePresence>
+          {toastMessage && (
+            <motion.div
+              key={toastMessage}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-[14px] bg-ink px-4 py-3 text-xs font-medium text-white shadow-xl border border-teal-700"
             >
-              ✕
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <Info size={16} className="text-amber" />
+              <span>{toastMessage}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
+                  setToastMessage(null)
+                }}
+                className="ml-2 hover:text-white/70"
+                aria-label="Dismiss message"
+              >
+                ✕
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       <Container>
         <div className="py-16 sm:py-20">

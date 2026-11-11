@@ -6,9 +6,8 @@ import {
   Navigation,
   Calendar,
   Pencil,
-  Info,
 } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import type { Provider } from '@/data/providers'
 import CorrectionModal from './CorrectionModal'
 import BookingModal from './BookingModal'
@@ -18,6 +17,7 @@ interface ProviderCardProps {
   index: number
   isSelected?: boolean
   onSelect?: () => void
+  onCallClick?: (provider: Provider) => void
 }
 
 const typeBadgeColors: Record<Provider['type'], string> = {
@@ -34,18 +34,16 @@ export default function ProviderCard({
   index,
   isSelected = false,
   onSelect,
+  onCallClick,
 }: ProviderCardProps) {
   const [correctionOpen, setCorrectionOpen] = useState(false)
   const [bookingOpen, setBookingOpen] = useState(false)
-  const [showCallToast, setShowCallToast] = useState(false)
 
   const badgeColor = typeBadgeColors[provider.type] ?? 'bg-surface text-ink'
 
-  const handleCallClick = () => {
-    setShowCallToast(true)
-    setTimeout(() => {
-      setShowCallToast(false)
-    }, 3500)
+  const handleCallClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onCallClick?.(provider)
   }
 
   return (
@@ -63,35 +61,6 @@ export default function ProviderCard({
         transition={{ duration: 0.35, delay: index * 0.04 }}
         aria-label={`Provider: ${provider.name}`}
       >
-        {/* Call Toast Notification */}
-        <AnimatePresence>
-          {showCallToast && (
-            <motion.div
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              className="absolute left-4 right-4 top-4 z-20 flex items-center justify-between gap-2 rounded-xl bg-ink p-3 text-xs text-white shadow-lg"
-            >
-              <div className="flex items-center gap-2">
-                <Info size={16} className="shrink-0 text-amber" />
-                <span>
-                  <strong>{provider.phoneDisplay}:</strong> Demo listing — calling is disabled in this prototype.
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setShowCallToast(false)
-                }}
-                className="text-gray-500 hover:text-white p-1"
-                aria-label="Close message"
-              >
-                ✕
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* Top Row: Name, Badge, Verified */}
         <div className="flex flex-wrap items-start gap-2">

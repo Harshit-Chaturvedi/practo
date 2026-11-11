@@ -22,7 +22,9 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import WorkflowDiagram from "../components/WorkflowDiagram";
-import { Container, SectionHeader, Card, Badge } from "@/components/ui";
+import SEO from "@/components/SEO";
+import { Container, SectionHeader, Card, Badge, ScrollReveal } from "@/components/ui";
+import { isAnimationAllowed } from "@/utils/animation";
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                              */
@@ -37,8 +39,8 @@ interface ToolRow {
 }
 
 const tools: ToolRow[] = [
-  { tool: "Make.com", category: "Automation", badgeVariant: "teal", whyUseIt: "Visual builder, 1,000+ integrations, reliable webhook execution", tradeoff: "Paid after free tier; potential vendor lock-in" },
-  { tool: "n8n", category: "Automation", badgeVariant: "teal", whyUseIt: "Self-hostable, open-source, complete data privacy and orchestration control", tradeoff: "Steeper learning curve; requires infrastructure hosting" },
+  { tool: "Make.com", category: "Automation", badgeVariant: "teal", whyUseIt: "Visual builder, 1,000+ integrations, reliable webhook execution (recommended production scale vs live Google Apps Script webhook)", tradeoff: "Paid after free tier; potential vendor lock-in" },
+  { tool: "n8n", category: "Automation", badgeVariant: "teal", whyUseIt: "Self-hostable, open-source, complete data privacy and orchestration control (recommended production scale vs live Google Apps Script webhook)", tradeoff: "Steeper learning curve; requires infrastructure hosting" },
   { tool: "Claude", category: "AI Writing", badgeVariant: "neutral", whyUseIt: "Excellent clinical long-form, adheres strictly to brand voice and tokens", tradeoff: "API costs scale with token volume" },
   { tool: "ChatGPT", category: "AI Writing", badgeVariant: "neutral", whyUseIt: "Versatile reasoning, extensive function-calling ecosystem", tradeoff: "Output requires strict prompt bounding to avoid generic tone" },
   { tool: "Canva", category: "Design", badgeVariant: "amber", whyUseIt: "Brand kit enforcement, collaborative templates, rapid asset assembly", tradeoff: "Limited custom headless code; raster export quality varies" },
@@ -46,7 +48,7 @@ const tools: ToolRow[] = [
   { tool: "Buffer", category: "Scheduling", badgeVariant: "outline", whyUseIt: "Clean multi-channel queue UI, performance analytics, lightweight", tradeoff: "Limited free tier; minimal AI-native drafting features" },
   { tool: "Metricool", category: "Scheduling", badgeVariant: "outline", whyUseIt: "Multi-platform analytics, competitor bench-marking, consolidated inbox", tradeoff: "UI is denser; steeper setup workflow" },
   { tool: "Tally", category: "Forms", badgeVariant: "neutral", whyUseIt: "Clean Notion-like forms, free custom domain hooks, webhook support", tradeoff: "Less complex multi-branch conditional logic than Typeform" },
-  { tool: "Airtable", category: "Database", badgeVariant: "teal", whyUseIt: "Relational views, interface designer, native automations and robust API", tradeoff: "Expensive at enterprise record scale; complex permission tiers" },
+  { tool: "Airtable", category: "Database", badgeVariant: "teal", whyUseIt: "Relational views, interface designer, native automations and robust API (recommended production scale vs live Google Sheet sync)", tradeoff: "Expensive at enterprise record scale; complex permission tiers" },
 ];
 
 interface TechItem {
@@ -89,8 +91,8 @@ interface LeadStep {
 
 const leadSteps: LeadStep[] = [
   { step: 1, label: "User Fills Form", detail: "LeadCaptureModal with UTM & intent capture", icon: FormInput },
-  { step: 2, label: "Webhook Dispatches", detail: "Make / n8n via VITE_LEAD_WEBHOOK_URL", icon: Webhook },
-  { step: 3, label: "Data Synchronized", detail: "Airtable / Google Sheets lead record", icon: Sheet },
+  { step: 2, label: "Google Apps Script Webhook", detail: "Direct POST to Apps Script /exec (no preflight); Make / n8n recommended for production scale", icon: Webhook },
+  { step: 3, label: "Google Sheet Synchronization", detail: "Appends row to 'Practo Leads' tab with auto-header; Airtable recommended at enterprise scale", icon: Sheet },
   { step: 4, label: "WhatsApp Onboarding", detail: "Automated invite link via WhatsApp API", icon: Send },
   { step: 5, label: "Email Confirmation", detail: "Syllabus PDF attachment & calendar invite", icon: Mail },
   { step: 6, label: "Cohort Notifications", detail: "D-3, D-1, and D-0 live reminders", icon: BellRing },
@@ -137,6 +139,10 @@ function categoryIcon(cat: string): LucideIcon {
 export default function WorkflowPage() {
   return (
     <main className="min-h-screen bg-cream">
+      <SEO
+        title="Content Automation Architecture & Technical Workflow | Practo for Animals"
+        description="Inspect our complete production content pipeline: Claude AI research, brand token automation, Google Apps Script lead capture webhook, and multi-channel publishing."
+      />
       {/* Hero header */}
       <header className="border-b border-border bg-surface/80 backdrop-blur-sm">
         <Container size="default" className="py-14 sm:py-20 text-center">
@@ -144,7 +150,7 @@ export default function WorkflowPage() {
             System Architecture & Automation
           </Badge>
           <motion.h1
-            initial={{ opacity: 0, y: 16 }}
+            initial={isAnimationAllowed() ? { opacity: 0, y: 16 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
             className="text-3xl sm:text-5xl font-extrabold text-ink font-heading tracking-tight"
@@ -152,7 +158,7 @@ export default function WorkflowPage() {
             Content & Data Automation Workflows
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={isAnimationAllowed() ? { opacity: 0, y: 12 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.4 }}
             className="mx-auto mt-4 max-w-2xl text-text-muted text-base sm:text-lg leading-relaxed"
@@ -254,18 +260,12 @@ export default function WorkflowPage() {
           />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {techStack.map((item, i) => (
-              <motion.div
-                key={item.name}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.04, duration: 0.3 }}
-              >
+              <ScrollReveal key={item.name} delay={i * 0.04}>
                 <Card variant="surface" className="p-5 h-full hover:border-teal/40 transition-colors">
                   <p className="font-heading font-bold text-ink text-sm sm:text-base">{item.name}</p>
                   <p className="mt-1.5 text-xs sm:text-sm text-text-muted leading-relaxed">{item.rationale}</p>
                 </Card>
-              </motion.div>
+              </ScrollReveal>
             ))}
           </div>
         </section>
@@ -352,12 +352,9 @@ export default function WorkflowPage() {
               {leadSteps.map((s, i) => {
                 const Icon = s.icon;
                 return (
-                  <motion.div
+                  <ScrollReveal
                     key={s.step}
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.05, duration: 0.3 }}
+                    delay={i * 0.05}
                     className="flex items-start gap-3.5"
                   >
                     {/* Step badge */}
@@ -375,7 +372,7 @@ export default function WorkflowPage() {
                     {i < leadSteps.length - 1 && i % 3 !== 2 && (
                       <ArrowRight className="hidden lg:block h-4 w-4 mt-2.5 shrink-0 text-teal/40" />
                     )}
-                  </motion.div>
+                  </ScrollReveal>
                 );
               })}
             </div>
@@ -396,13 +393,11 @@ export default function WorkflowPage() {
             {nextBuilds.map((card, i) => {
               const Icon = card.icon;
               return (
-                <motion.article
+                <ScrollReveal
                   key={card.title}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.05, duration: 0.35 }}
-                  aria-label={card.title}
+                  as="article"
+                  delay={i * 0.05}
+                  className="h-full"
                 >
                   <Card variant="surface" className="h-full p-6 hover:border-teal/40 transition-colors">
                     <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-[12px] bg-teal-50 border border-teal-100 text-teal">
@@ -411,7 +406,7 @@ export default function WorkflowPage() {
                     <h3 className="text-base font-heading font-bold text-ink">{card.title}</h3>
                     <p className="mt-2 text-xs sm:text-sm text-text-muted leading-relaxed">{card.description}</p>
                   </Card>
-                </motion.article>
+                </ScrollReveal>
               );
             })}
           </div>

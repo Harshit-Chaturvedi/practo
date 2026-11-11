@@ -39,6 +39,7 @@ export default function BookingModal({
 
   const overlayRef = useRef<HTMLDivElement>(null)
   const firstInputRef = useRef<HTMLInputElement>(null)
+  const openerRef = useRef<HTMLElement | null>(null)
 
   const resetForm = useCallback(() => {
     setSelectedDate(DATE_SLOTS[0].date)
@@ -52,12 +53,15 @@ export default function BookingModal({
   const handleClose = useCallback(() => {
     resetForm()
     onClose()
+    setTimeout(() => {
+      openerRef.current?.focus()
+    }, 50)
   }, [resetForm, onClose])
 
-  // Focus trap
+  // Focus trap & Opener tracking
   useEffect(() => {
     if (!isOpen) return
-
+    openerRef.current = document.activeElement as HTMLElement
     const timer = setTimeout(() => firstInputRef.current?.focus(), 100)
 
     function handleTab(e: KeyboardEvent) {
@@ -208,7 +212,7 @@ export default function BookingModal({
                 </p>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-4">
                 {/* Date chips */}
                 <fieldset>
                   <legend className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink">
@@ -269,14 +273,29 @@ export default function BookingModal({
                     ref={firstInputRef}
                     id="booking-name"
                     type="text"
-                    required
                     value={petParentName}
-                    onChange={(e) => setPetParentName(e.target.value)}
+                    onChange={(e) => {
+                      setPetParentName(e.target.value)
+                      if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }))
+                    }}
+                    aria-invalid={Boolean(errors.name)}
+                    aria-describedby={errors.name ? 'booking-name-error' : undefined}
                     placeholder="Enter your name"
-                    className="min-h-[44px] w-full rounded-[var(--radius-input)] border border-border bg-white px-3.5 py-2 text-sm text-ink transition-colors focus:border-teal focus:ring-1 focus:ring-teal focus-visible:outline-none"
+                    className={`min-h-[44px] w-full rounded-[var(--radius-input)] border bg-white px-3.5 py-2 text-sm text-ink transition-colors focus:ring-1 focus-visible:outline-none ${
+                      errors.name
+                        ? 'border-red-emergency focus:border-red-emergency focus:ring-red-emergency'
+                        : 'border-border focus:border-teal focus:ring-teal'
+                    }`}
                   />
                   {errors.name && (
-                    <p className="mt-1 text-xs text-red-emergency">{errors.name}</p>
+                    <p
+                      id="booking-name-error"
+                      aria-live="polite"
+                      className="mt-1 text-xs text-red-emergency font-medium flex items-center gap-1"
+                    >
+                      <AlertCircle size={13} className="shrink-0" />
+                      <span>{errors.name}</span>
+                    </p>
                   )}
                 </div>
 
@@ -291,14 +310,29 @@ export default function BookingModal({
                   <input
                     id="booking-phone"
                     type="tel"
-                    required
                     value={petParentPhone}
-                    onChange={(e) => setPetParentPhone(e.target.value)}
+                    onChange={(e) => {
+                      setPetParentPhone(e.target.value)
+                      if (errors.phone) setErrors((prev) => ({ ...prev, phone: undefined }))
+                    }}
+                    aria-invalid={Boolean(errors.phone)}
+                    aria-describedby={errors.phone ? 'booking-phone-error' : undefined}
                     placeholder="10-digit mobile number"
-                    className="min-h-[44px] w-full rounded-[var(--radius-input)] border border-border bg-white px-3.5 py-2 text-sm text-ink transition-colors focus:border-teal focus:ring-1 focus:ring-teal focus-visible:outline-none"
+                    className={`min-h-[44px] w-full rounded-[var(--radius-input)] border bg-white px-3.5 py-2 text-sm text-ink transition-colors focus:ring-1 focus-visible:outline-none ${
+                      errors.phone
+                        ? 'border-red-emergency focus:border-red-emergency focus:ring-red-emergency'
+                        : 'border-border focus:border-teal focus:ring-teal'
+                    }`}
                   />
                   {errors.phone && (
-                    <p className="mt-1 text-xs text-red-emergency">{errors.phone}</p>
+                    <p
+                      id="booking-phone-error"
+                      aria-live="polite"
+                      className="mt-1 text-xs text-red-emergency font-medium flex items-center gap-1"
+                    >
+                      <AlertCircle size={13} className="shrink-0" />
+                      <span>{errors.phone}</span>
+                    </p>
                   )}
                 </div>
 

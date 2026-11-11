@@ -110,6 +110,7 @@ export default function LeadCaptureModal({ open, onClose, intent = 'reserve' }: 
   const [errors, setErrors] = useState<FieldErrors>({})
   const modalRef = useRef<HTMLDivElement>(null)
   const firstInputRef = useRef<HTMLInputElement>(null)
+  const openerRef = useRef<HTMLElement | null>(null)
 
   const isSyllabus = intent === 'syllabus'
 
@@ -120,12 +121,15 @@ export default function LeadCaptureModal({ open, onClose, intent = 'reserve' }: 
     setWebsiteUrlHoneypot('')
     setErrors({})
     onClose()
+    setTimeout(() => {
+      openerRef.current?.focus()
+    }, 50)
   }, [onClose])
 
-  /* Focus trap */
+  /* Focus trap & Opener tracking */
   useEffect(() => {
     if (!open) return
-
+    openerRef.current = document.activeElement as HTMLElement
     const timer = setTimeout(() => firstInputRef.current?.focus(), 100)
 
     function handleTab(e: KeyboardEvent) {
@@ -361,15 +365,23 @@ export default function LeadCaptureModal({ open, onClose, intent = 'reserve' }: 
             ref={firstInputRef}
             id="lead-name"
             type="text"
-            required
             value={contact.fullName}
-            onChange={(e) => setContact((p) => ({ ...p, fullName: e.target.value }))}
+            onChange={(e) => {
+              setContact((p) => ({ ...p, fullName: e.target.value }))
+              if (errors.fullName) setErrors((prev) => ({ ...prev, fullName: undefined }))
+            }}
+            aria-invalid={Boolean(errors.fullName)}
+            aria-describedby={errors.fullName ? 'lead-name-error' : undefined}
             className={`w-full min-h-[44px] px-4 py-2.5 rounded-[12px] border ${
               errors.fullName ? 'border-red-emergency' : 'border-border'
             } bg-white text-ink focus:border-teal focus:outline-none transition-colors`}
             placeholder="Your full name"
           />
-          {errors.fullName && <p className="text-red-emergency text-xs mt-1">{errors.fullName}</p>}
+          {errors.fullName && (
+            <p id="lead-name-error" aria-live="polite" className="text-red-emergency text-xs mt-1 font-medium">
+              {errors.fullName}
+            </p>
+          )}
         </div>
 
         {!isSyllabus && (
@@ -380,15 +392,23 @@ export default function LeadCaptureModal({ open, onClose, intent = 'reserve' }: 
             <input
               id="lead-whatsapp"
               type="tel"
-              required
               value={contact.whatsapp}
-              onChange={(e) => setContact((p) => ({ ...p, whatsapp: e.target.value }))}
+              onChange={(e) => {
+                setContact((p) => ({ ...p, whatsapp: e.target.value }))
+                if (errors.whatsapp) setErrors((prev) => ({ ...prev, whatsapp: undefined }))
+              }}
+              aria-invalid={Boolean(errors.whatsapp)}
+              aria-describedby={errors.whatsapp ? 'lead-whatsapp-error' : undefined}
               className={`w-full min-h-[44px] px-4 py-2.5 rounded-[12px] border ${
                 errors.whatsapp ? 'border-red-emergency' : 'border-border'
               } bg-white text-ink focus:border-teal focus:outline-none transition-colors`}
               placeholder="9876543210"
             />
-            {errors.whatsapp && <p className="text-red-emergency text-xs mt-1">{errors.whatsapp}</p>}
+            {errors.whatsapp && (
+              <p id="lead-whatsapp-error" aria-live="polite" className="text-red-emergency text-xs mt-1 font-medium">
+                {errors.whatsapp}
+              </p>
+            )}
           </div>
         )}
 
@@ -399,15 +419,23 @@ export default function LeadCaptureModal({ open, onClose, intent = 'reserve' }: 
           <input
             id="lead-email"
             type="email"
-            required
             value={contact.email}
-            onChange={(e) => setContact((p) => ({ ...p, email: e.target.value }))}
+            onChange={(e) => {
+              setContact((p) => ({ ...p, email: e.target.value }))
+              if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }))
+            }}
+            aria-invalid={Boolean(errors.email)}
+            aria-describedby={errors.email ? 'lead-email-error' : undefined}
             className={`w-full min-h-[44px] px-4 py-2.5 rounded-[12px] border ${
               errors.email ? 'border-red-emergency' : 'border-border'
             } bg-white text-ink focus:border-teal focus:outline-none transition-colors`}
             placeholder="you@example.com"
           />
-          {errors.email && <p className="text-red-emergency text-xs mt-1">{errors.email}</p>}
+          {errors.email && (
+            <p id="lead-email-error" aria-live="polite" className="text-red-emergency text-xs mt-1 font-medium">
+              {errors.email}
+            </p>
+          )}
         </div>
       </div>
     )

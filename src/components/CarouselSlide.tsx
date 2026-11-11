@@ -145,7 +145,7 @@ function BrandingFooter({
           }}
           className="font-heading font-bold"
         >
-          Practo <span style={{ color: isDark ? '#F59E0B' : '#0F766E' }}>for Animals</span>
+          Practo <span style={{ color: isDark ? '#FDE68A' : '#0F766E' }}>for Animals</span>
         </span>
       </div>
 
@@ -189,9 +189,9 @@ function HookSlideContent({
           className="font-heading font-bold uppercase tracking-wider"
           style={{
             fontSize: 20 * scale,
-            color: '#F59E0B',
-            backgroundColor: 'rgba(245, 158, 11, 0.15)',
-            border: `${1 * scale}px solid rgba(245, 158, 11, 0.4)`,
+            color: '#FDE68A',
+            backgroundColor: 'rgba(253, 230, 138, 0.15)',
+            border: `${1 * scale}px solid rgba(253, 230, 138, 0.4)`,
             padding: `${6 * scale}px ${16 * scale}px`,
             borderRadius: 20 * scale,
           }}
@@ -361,27 +361,33 @@ function CtaSlideContent({
       </div>
 
       {/* centre content */}
-      <div className="flex flex-col items-center text-center" style={{ gap: 36 * scale }}>
+      <div className="flex flex-col items-center text-center w-full" style={{ gap: 28 * scale }}>
         <div
-          className="rounded-full flex items-center justify-center"
+          className="rounded-full flex items-center justify-center shrink-0"
           style={{
-            width: 120 * scale,
-            height: 120 * scale,
+            width: 110 * scale,
+            height: 110 * scale,
             backgroundColor: 'rgba(255,255,255,0.1)',
             border: `${2 * scale}px solid rgba(255,255,255,0.2)`,
           }}
         >
-          <PawPrint size={64 * scale} style={{ color: '#F59E0B' }} aria-hidden="true" />
+          <PawPrint size={56 * scale} style={{ color: '#FDE68A' }} aria-hidden="true" />
         </div>
         <h2
-          className="font-heading font-extrabold leading-[1.15] text-white"
-          style={{ fontSize: 64 * scale }}
+          className="font-heading font-extrabold leading-[1.2] text-white"
+          style={{ fontSize: 50 * scale, maxWidth: 940 * scale, margin: 0 }}
         >
           {slide.headline}
         </h2>
         <p
           className="font-body"
-          style={{ fontSize: 34 * scale, color: '#EEF5F3', maxWidth: 840 * scale }}
+          style={{
+            fontSize: 30 * scale,
+            color: '#EEF5F3',
+            maxWidth: 860 * scale,
+            lineHeight: 1.4,
+            margin: 0,
+          }}
         >
           {slide.subheadline}
         </p>
@@ -392,10 +398,11 @@ function CtaSlideContent({
           style={{
             backgroundColor: '#F59E0B',
             color: '#1F2A2E',
-            padding: `${22 * scale}px ${60 * scale}px`,
+            padding: `${20 * scale}px ${54 * scale}px`,
             borderRadius: 16 * scale,
-            fontSize: 34 * scale,
+            fontSize: 32 * scale,
             letterSpacing: '-0.01em',
+            marginTop: 6 * scale,
           }}
           role="presentation"
         >

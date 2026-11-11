@@ -20,11 +20,13 @@ import {
   Users,
   SearchX,
   Sparkles,
+  Info,
 } from 'lucide-react'
 import { providers, animalTypes, languageOptions } from '@/data/providers'
 import type { Provider } from '@/data/providers'
 import ProviderCard from '@/components/ProviderCard'
 import InteractiveMap from '@/components/InteractiveMap'
+import SEO from '@/components/SEO'
 import { Container, Button, SectionHeader, ToggleSwitch } from '@/components/ui'
 
 // ---------------------------------------------------------------------------
@@ -236,6 +238,20 @@ export default function HomePage() {
   const [priceBand, setPriceBand] = useState<PriceBand | null>(null)
   const [verifiedOnly, setVerifiedOnly] = useState(false)
   const [filterLanguages, setFilterLanguages] = useState<string[]>([])
+
+  // Call Toast notification state (Single live region - replaces previous instead of stacking)
+  const [activeCallToast, setActiveCallToast] = useState<{ id: string; name: string; phone: string } | null>(null)
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleCallClick = useCallback((provider: Provider) => {
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current)
+    }
+    setActiveCallToast({ id: provider.id, name: provider.name, phone: provider.phoneDisplay })
+    toastTimerRef.current = setTimeout(() => {
+      setActiveCallToast(null)
+    }, 3500)
+  }, [])
 
   // View state
   const [sortBy, setSortBy] = useState<SortOption>('nearest')
@@ -607,6 +623,10 @@ export default function HomePage() {
   // ---------------------------------------------------------------------------
   return (
     <div className="min-h-screen bg-cream">
+      <SEO
+        title="Practo for Animals — Trusted Veterinary Care & Emergency Directory in Mumbai"
+        description="Find verified animal clinics, 24/7 ICU hospitals, ambulances, and rescue NGOs across Mumbai with verified doctor hours and fees."
+      />
       {/* ================================================================ */}
       {/* 1. HERO SECTION (Split Layout)                                   */}
       {/* ================================================================ */}
@@ -785,7 +805,7 @@ export default function HomePage() {
                     {tile.label}
                   </span>
                   <span
-                    className={`text-[11px] mt-1 line-clamp-1 ${
+                    className={`text-[11px] mt-1 line-clamp-2 leading-tight ${
                       isActive ? 'text-teal-100' : 'text-text-muted'
                     }`}
                   >
@@ -980,6 +1000,7 @@ export default function HomePage() {
                           index={i}
                           isSelected={selectedMapProviderId === provider.id}
                           onSelect={() => setSelectedMapProviderId(provider.id)}
+                          onCallClick={handleCallClick}
                         />
                       ))}
                     </div>
@@ -1005,6 +1026,7 @@ export default function HomePage() {
                       key={provider.id}
                       provider={provider}
                       index={i}
+                      onCallClick={handleCallClick}
                     />
                   ))}
                 </div>
@@ -1084,7 +1106,7 @@ export default function HomePage() {
       {/* ================================================================ */}
       <section
         id="list-business"
-        className="bg-teal-dark border-t border-teal-900 py-18 sm:py-24 text-white"
+        className="bg-teal-dark border-t border-teal-900 py-18 sm:py-24 text-white scroll-mt-20"
         aria-label="List your business"
       >
         <Container size="narrow">
@@ -1106,6 +1128,44 @@ export default function HomePage() {
           </div>
         </Container>
       </section>
+
+      {/* Global Call Notification Live Region — Replaces instead of stacking */}
+      <div
+        role="status"
+        aria-live="polite"
+        className="fixed bottom-6 right-6 z-50 pointer-events-none max-w-sm"
+      >
+        <AnimatePresence>
+          {activeCallToast && (
+            <motion.div
+              key={`${activeCallToast.id}-${activeCallToast.phone}`}
+              initial={{ opacity: 0, y: 12, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 8, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="pointer-events-auto flex items-center justify-between gap-3 rounded-[14px] bg-ink px-4 py-3 text-xs text-white shadow-xl border border-teal-700"
+            >
+              <div className="flex items-center gap-2">
+                <Info size={16} className="shrink-0 text-amber" />
+                <span>
+                  <strong>{activeCallToast.phone}:</strong> Demo listing — calling is disabled in this prototype.
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
+                  setActiveCallToast(null)
+                }}
+                className="text-text-muted hover:text-white p-1 shrink-0 transition-colors"
+                aria-label="Dismiss notification"
+              >
+                ✕
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }
