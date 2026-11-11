@@ -69,8 +69,8 @@ The application will be live at `http://localhost:5173`.
 - **Dual-Intent Lead-Capture Modal**:
   - **For Syllabus Downloads**: Step 1 captures Full Name and Email, directly triggers a download of `/syllabus.pdf`, and confirms submission.
   - **For Seat Reservation**: Step 1 collects contact info, Step 2 collects role/interests/batch, and Step 3 provides active calendar triggers (Google Calendar template URL and client-side downloadable `.ics` file) alongside WhatsApp group community invite handling via `VITE_WHATSAPP_INVITE_URL`.
-  - **Client-Side Persistence & Resilient Webhook**: Submissions are guaranteed to be saved first to `localStorage['practo_leads']`. Asynchronously, a JSON payload is dispatched to `VITE_LEAD_WEBHOOK_URL` with `Content-Type: text/plain;charset=utf-8` (preventing CORS preflight delays), a 5-second timeout, and an automated retry. Failures are handled completely silently so the user experience is never blocked.
-  - **Serverless Ingestion**: A pre-built Google Apps Script webhook receiver is included in [`google-apps-script/Code.gs`](google-apps-script/Code.gs). See [`docs/LEAD_WEBHOOK_SETUP.md`](docs/LEAD_WEBHOOK_SETUP.md) for 2-minute step-by-step setup instructions.
+  - **Client-Side Persistence & Resilient Webhook**: Submissions are guaranteed to be saved first to `localStorage['practo_leads']`. Lead form posts to a Google Apps Script web app that appends rows to a Google Sheet (`VITE_LEAD_WEBHOOK_URL`, dispatched asynchronously as a JSON string with `Content-Type: text/plain;charset=utf-8` to avoid CORS preflight delays, a 5-second timeout, and one automated retry). Failures are handled completely silently so the user experience is never blocked.
+  - **Serverless Ingestion**: The Google Apps Script receiver lives in [`google-apps-script/Code.gs`](google-apps-script/Code.gs), with setup details in [`docs/LEAD_WEBHOOK_SETUP.md`](docs/LEAD_WEBHOOK_SETUP.md).
 
 #### Webhook Payload Specification
 Every submission sent to `VITE_LEAD_WEBHOOK_URL` delivers a clean JSON payload matching this schema:
