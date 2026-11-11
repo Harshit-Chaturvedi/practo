@@ -2,13 +2,13 @@
 
 Dear Founder,
 
-I have delivered the complete Practo for Animals MVP and AI Education ecosystem as a production-ready, responsive web application across all four specified routes.
+I have delivered the complete Practo for Animals MVP and AI Education ecosystem as a production-ready, responsive web application across all four routes (live at https://practo-lovat.vercel.app).
 
-The platform includes an intuitive animal-care discovery engine featuring 13 realistic providers, 10 dynamic filters, and an interactive SVG pin map. It also features a high-converting AI course landing page with a dual-intent lead capture modal (supporting immediate syllabus downloads, WhatsApp invites, and Google Calendar/.ics event integration), a data-driven 7-slide educational carousel with sub-1MB PDF export, and an automated content workflow strategy blueprint.
+The platform includes an animal-care discovery engine with 13 realistic providers, 10 dynamic filters, and an interactive Mumbai pin map. It also features an outcome-driven AI course landing page with dual-intent lead capture (instant syllabus download, WhatsApp group invites, and calendar reminders), a 7-slide educational carousel with sub-1MB PDF export, and an automated content workflow strategy blueprint.
 
-Key assumptions: all provider listings are fictional placeholders to maintain platform integrity, unsourced veterinary health claims carry visible disclaimer tags, and lead submissions use resilient offline-first persistence.
+Key assumptions: provider listings are realistic pilot mocks, unsourced health tips carry visible disclaimers, and lead submissions use resilient offline-first persistence backed by a Google Sheets webhook.
 
-This project was built with AI coding tools (Antigravity and Claude) and reviewed and edited by me. Total time taken: [YOUR ACTUAL HOURS].
+This project was built with AI coding tools (Antigravity and Claude) and reviewed and edited by me.
 
 Warm regards,  
-Candidate — Product Development, Design & AI Systems Intern
+Harshit Chaturvedi
